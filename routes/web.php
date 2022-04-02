@@ -73,77 +73,33 @@ Route::middleware(['auth'])->group(function () {
         Route::post('delete', 'RazonesSocialesController@delete');
     });
 
-    #Clientes
-    Route::middleware(['permission:clientes_ver'])->prefix('clientes')->group(function () {
-        Route::get('/', 'ClientesController@index');
-        Route::get('reload', 'ClientesController@index');
-        Route::get('form/{id?}', 'ClientesController@form')->where('id', '[0-9]+')->middleware('permission:clientes_editar');
-        Route::get('generar-estado-cuenta', 'ClientesController@generarEstadoCuenta');
-        Route::get('{cliente_id}/exportar/pdf/{vista}', 'ClientesController@generarPDF');
-        Route::post('filter', 'ClientesController@filter');
-        Route::post('show', 'ClientesController@show');
-        Route::post('save', 'ClientesController@save');
-        Route::post('change-status', 'ClientesController@changeStatus');
-        Route::post('update', 'ClientesController@update');
-        Route::post('delete', 'ClientesController@delete');
+    #Empleados
+    Route::middleware(['permission:empleados_ver'])->prefix('empleados')->group(function () {
+        Route::get('/', 'EmpleadosController@index');
+        Route::get('reload', 'EmpleadosController@index');
+        Route::get('form/{id?}', 'EmpleadosController@form')->where('id', '[0-9]+')->middleware('permission:empleados_editar');
+        Route::get('generar-historico', 'EmpleadosController@generarHistorico');
+        Route::get('{cliente_id}/exportar/pdf/{vista}', 'EmpleadosController@generarPDF');
+        Route::post('filter', 'EmpleadosController@filter');
+        Route::post('show', 'EmpleadosController@show');
+        Route::post('save', 'EmpleadosController@save');
+        Route::post('change-status', 'EmpleadosController@changeStatus');
+        Route::post('update', 'EmpleadosController@update');
+        Route::post('delete', 'EmpleadosController@delete');
     });
 
-    #Facturas
-    Route::middleware(['permission:facturas_ver'])->prefix('facturas')->group(function () {
-        Route::get('/', 'FacturasController@index');
-        Route::get('reload', 'FacturasController@index');
-        Route::get('form/{id?}', 'FacturasController@form')->where('id', '[0-9]+')->middleware('permission:facturas_editar');
-        Route::get('excel/export', 'FacturasController@export');
-        Route::post('filter', 'FacturasController@filter');
-        Route::post('get-details', 'FacturasController@getDetails');
-        Route::post('save', 'FacturasController@save');
-        Route::post('cancell', 'FacturasController@cancell');
-        Route::post('update', 'FacturasController@update');
-        Route::post('delete', 'FacturasController@delete');
-    });
-
-    #Cobranza
-    Route::middleware(['permission:cobranza_ver'])->prefix('cobranza')->group(function () {
-        Route::get('/', 'CobranzasController@index');
-        Route::get('reload', 'CobranzasController@index');
-        Route::get('excel/export', 'CobranzasController@export');
-        Route::get('comentarios/excel/export', 'CobranzasController@exportComments');
-        Route::post('filter', 'CobranzasController@filter');
-        Route::post('comentarios', 'CobranzasController@getComments');
-        Route::post('comentarios/save', 'CobranzasController@save');
-        Route::post('comentarios/delete', 'CobranzasController@delete');
-    });
-
-    #Facturas canceladas
-    Route::middleware(['permission:facturas_canceladas_ver'])->prefix('facturas/canceladas')->group(function () {
-        Route::get('/', 'FacturasCanceladasController@index');
-        Route::get('form/{id?}', 'FacturasCanceladasController@form')->where('id', '[0-9]+')->middleware('permission:facturas_canceladas_editar');
-        Route::post('filter', 'FacturasCanceladasController@filter');
-        Route::post('delete', 'FacturasCanceladasController@delete');
-    });
-
-    #Notas de crédito
-    Route::middleware(['permission:notas_de_credito_ver'])->prefix('notas-de-credito')->group(function () {
-        Route::get('/', 'NotasDeCreditoController@index');
-        Route::get('form/{id?}', 'NotasDeCreditoController@form')->where('id', '[0-9]+')->middleware('permission:notas_de_credito_editar');
-        Route::get('excel/export', 'NotasDeCreditoController@export');
-        Route::post('filter', 'NotasDeCreditoController@filter');
-        Route::post('save', 'NotasDeCreditoController@save');
-        Route::post('change-status', 'NotasDeCreditoController@changeStatus');
-        Route::post('update', 'NotasDeCreditoController@update');
-        Route::post('delete', 'NotasDeCreditoController@delete');
-    });
-
-    #Pagos
-    Route::middleware(['permission:pagos_ver'])->prefix('pagos')->group(function () {
-        Route::get('/', 'PagosController@index');
-        Route::get('form/{id?}', 'PagosController@form')->where('id', '[0-9]+')->middleware('permission:pagos_ver');
-        Route::get('excel/export', 'PagosController@export');
-        Route::post('filter', 'PagosController@filter');
-        Route::post('save', 'PagosController@save');
-        Route::post('change-status', 'PagosController@changeStatus');
-        Route::post('update', 'PagosController@update');
-        Route::post('delete', 'PagosController@delete');
+    #Artículos
+    Route::middleware(['permission:articulos_ver'])->prefix('articulos')->group(function () {
+        Route::get('/', 'ArticulosController@index');
+        Route::get('reload', 'ArticulosController@index');
+        Route::get('form/{id?}', 'ArticulosController@form')->where('id', '[0-9]+')->middleware('permission:articulos_editar');
+        Route::get('excel/export', 'ArticulosController@export');
+        Route::post('filter', 'ArticulosController@filter');
+        Route::post('get-details', 'ArticulosController@getDetails');
+        Route::post('save', 'ArticulosController@save');
+        Route::post('cancell', 'ArticulosController@cancell');
+        Route::post('update', 'ArticulosController@update');
+        Route::post('delete', 'ArticulosController@delete');
     });
 
     #Users CRUD

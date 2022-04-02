@@ -40,7 +40,7 @@
                             <div class="card-header">
                                 <div class="col-md-12">
                                     <a href="javascript:;" class="btn btn-dark filter-rows" data-callback="fillDashboardData"> <i class="mdi mdi-filter-variant"></i> Filtrar</a>
-                                    <a href="javascript:;" class="btn btn-info export-rows" data-url="{{url('dashboard/excel/export?')}}"> <i class="mdi mdi-file-excel"></i> Exportar facturas</a>
+                                    <a href="javascript:;" class="btn btn-info export-rows" data-url="{{url('dashboard/excel/export?')}}"> <i class="mdi mdi-file-excel"></i> Exportar histórico artículos</a>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 my-auto filter-section">
@@ -65,46 +65,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-md-12 text-center m-t-15">
-                        <h3>Facturas para esta semana</h3>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="card m-b-30">
-                            <div class="">
-                                <div class="table-responsive tabla-facturas">
-                                    <table class="table table-borderless table-hover">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col">Nombre del cliente</th>
-                                            <th scope="col">Monto de factura</th>
-                                            <th scope="col">Fecha promesa de pago</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                            @if( count ( $facturasPrometidasSemana ) )
-                                                @foreach( $facturasPrometidasSemana as $factura )
-                                                    <tr>
-                                                        <td class="border-left border-strong border-success">{{$factura->cliente->nombre}}</td>
-                                                        <td>
-                                                           ${{ number_format($factura->importe) }}mxn
-                                                        </td>
-                                                        <td>
-                                                            {{strftime('%d', strtotime($factura->fecha_promesa_pago)).' de '.strftime('%B', strtotime($factura->fecha_promesa_pago)). ' del '.strftime('%Y', strtotime($factura->fecha_promesa_pago))}}
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
-                                                <tr class="text-center">
-                                                    <td colspan="3">No hay facturas pendientes de pago para esta semana</td>
-                                                </tr>
-                                            @endif
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -116,8 +76,8 @@
                             <a href="#" class="badge badge-soft-success"> <i class="mdi mdi-arrow-down"></i> 12 %</a>
                         </div> --}}
                         <div class="text-center p-t-30 p-b-20">
-                            <div class="text-overline text-muted opacity-75">Total de clientes</div>
-                            <h1 class="text-success total-clientes">#{{number_format($data->totalClientes, 0)}}</h1>
+                            <div class="text-overline text-muted opacity-75">Total de empleados</div>
+                            <h1 class="text-success total-clientes">#{{number_format($data->totalEmpleados, 0)}}</h1>
                         </div>
                     </div>
                 </div>
@@ -129,8 +89,8 @@
                             <a href="#" class="badge badge-soft-success"> <i class="mdi mdi-arrow-up"></i> 32 %</a>
                         </div> --}}
                         <div class="text-center p-t-30 p-b-20">
-                            <div class="text-overline text-muted opacity-75">Facturas pagadas del periodo</div>
-                            <h1 class="text-info total-facturas-pagadas-mes">${{number_format($data->totalFacturasPagadasMes, 0)}}</h1>
+                            <div class="text-overline text-muted opacity-75">Empleados activos</div>
+                            <h1 class="text-info total-facturas-pagadas-mes">#{{number_format($data->totalEmpleadosActivos, 0)}}</h1>
                         </div>
                     </div>
                 </div>
@@ -142,8 +102,8 @@
                             <a href="#" class="badge badge-soft-info"> <i class="mdi mdi-arrow-down"></i> 10 %</a>
                         </div> --}}
                         <div class="text-center p-t-30 p-b-20">
-                            <div class="text-overline text-muted opacity-75">Facturas NO pagadas del periodo</div>
-                            <h1 class="text-info total-facturas-no-pagadas-mes">${{number_format($data->totalFacturasNOPagadasMes, 2)}}</h1>
+                            <div class="text-overline text-muted opacity-75">Empleados inactivos</div>
+                            <h1 class="text-info total-facturas-no-pagadas-mes">#{{number_format($data->totalEmpleadosInactivos, 0)}}</h1>
                         </div>
                     </div>
                 </div>
@@ -157,8 +117,8 @@
                             <a href="#" class="badge badge-soft-info"> <i class="mdi mdi-arrow-down"></i> 10 %</a>
                         </div> --}}
                         <div class="text-center p-t-30 p-b-20">
-                            <div class="text-overline text-muted opacity-75">Notas de crédito del periodo</div>
-                            <h1 class="text-info total-notas-credito-mes">${{number_format($data->totalNotasCreditoMes, 2)}}</h1>
+                            <div class="text-overline text-muted opacity-75">Artículos entregados</div>
+                            <h1 class="text-info total-notas-credito-mes">#{{number_format($data->totalArticulosEntregados, 0)}}</h1>
                         </div>
                     </div>
                 </div>
@@ -170,96 +130,22 @@
                             <a href="#" class="badge badge-soft-info"> <i class="mdi mdi-arrow-down"></i> 10 %</a>
                         </div> --}}
                         <div class="text-center p-t-30 p-b-20">
-                            <div class="text-overline text-muted opacity-75">Pagos del periodo</div>
-                            <h1 class="text-info total-pagos-mes">${{number_format($data->totalPagosMes, 2)}}</h1>
+                            <div class="text-overline text-muted opacity-75">Artículos recibidos</div>
+                            <h1 class="text-info total-pagos-mes">#{{number_format($data->totalArticulosRecibidos, 0)}}</h1>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col m-b-30">
+            {{-- <div class="col m-b-30">
                 <div class="card">
                     <div class="card-body">
-                        {{-- <div class="card-controls">
-                            <a href="#" class="badge badge-soft-info"> <i class="mdi mdi-arrow-down"></i> 10 %</a>
-                        </div> --}}
                         <div class="text-center p-t-30 p-b-20">
                             <div class="text-overline text-muted opacity-75">Monto de facturas NO pagadas</div>
                             <h1 class="text-info total-facturas-no-pagadas">${{number_format($data->totalFacturasNOPagadas, 2)}}</h1>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="row d-lg-flex">
-            <div class="col-md-12 text-center m-t-15">
-                <h3>Datos de todo el tiempo</h3>
-            </div>
-            <div class="col m-b-30">
-                <div class="card">
-                    <div class="card-body">
-                        {{-- <div class="card-controls">
-                            <a href="#" class="badge badge-soft-info"> <i class="mdi mdi-arrow-down"></i> 10 %</a>
-                        </div> --}}
-                        <div class="text-center p-t-30 p-b-20">
-                            <div class="text-overline text-muted opacity-75">
-                                Facturas normales
-                                <br>
-                                ( Sin atraso )
-                            </div>
-                            <h1 class="text-info total-facturas-normales">{{number_format($data->totalFacturasNormales, 0)}}</h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col m-b-30">
-                <div class="card">
-                    <div class="card-body">
-                        {{-- <div class="card-controls">
-                            <a href="#" class="badge badge-soft-info"> <i class="mdi mdi-arrow-down"></i> 10 %</a>
-                        </div> --}}
-                        <div class="text-center p-t-30 p-b-20">
-                            <div class="text-overline text-muted opacity-75">
-                                Facturas morosas
-                                ( 45 a 60 días de atraso )
-                            </div>
-                            <h1 class="text-info total-facturas-morosas">{{number_format($data->totalFacturasMorosas, 0)}}</h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col m-b-30">
-                <div class="card">
-                    <div class="card-body">
-                        {{-- <div class="card-controls">
-                            <a href="#" class="badge badge-soft-info"> <i class="mdi mdi-arrow-down"></i> 10 %</a>
-                        </div> --}}
-                        <div class="text-center p-t-30 p-b-20">
-                            <div class="text-overline text-muted opacity-75">
-                                Facturas prelegales
-                                ( 61 a 80 días de atraso )
-                            </div>
-                            <h1 class="text-info total-facturas-prelegales">{{number_format($data->totalFacturasPrelegales, 0)}}</h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col m-b-30">
-                <div class="card">
-                    <div class="card-body">
-                        {{-- <div class="card-controls">
-                            <a href="#" class="badge badge-soft-info"> <i class="mdi mdi-arrow-down"></i> 10 %</a>
-                        </div> --}}
-                        <div class="text-center p-t-30 p-b-20">
-                            <div class="text-overline text-muted opacity-75">
-                                Facturas legales
-                                ( 81 días o más de atraso )
-                            </div>
-                            <h1 class="text-info total-facturas-legales">{{number_format($data->totalFacturasLegales, 0)}}</h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 </section>
@@ -275,7 +161,7 @@
         const opt = { style: 'currency', currency: 'USD', maximumFractionDigits: 2 };
         const numFormat = new Intl.NumberFormat('en-US', opt);
 
-        $('.total-clientes').text('#'+general.totalClientes);
+        $('.total-empleados').text('#'+general.totalClientes);
         $('.total-facturas-pagadas-mes').text(numFormat.format( general.totalFacturasPagadasMes ) );
         $('.total-facturas-no-pagadas-mes').text(numFormat.format( general.totalFacturasNOPagadasMes ) );
         $('.total-notas-credito-mes').text(numFormat.format( general.totalNotasCreditoMes ) );

@@ -24,8 +24,17 @@ class Articulo extends Model
      * Get the bill related to the record
      *
      */
-    public function factura()
+    public function entregados()
     {
-        return $this->belongsTo('App\Factura');
+        return $this->hasMany('App\Historial')->where('tipo_recibo_id', 1);
+    }
+
+    /**
+     * Get the bill related to the record
+     *
+     */
+    public function recibidos()
+    {
+        return $this->hasMany('App\Historial')->where('tipo_recibo_id', 2);
     }
 }

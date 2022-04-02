@@ -20,7 +20,7 @@
                         <label>Status</label>
                         <select id="status_cliente_id" name="status_cliente_id" class="form-control" data-msg="Status cliente">
                             <option value="" selected>Status (Cualquiera)</option>
-                            @foreach($statusCliente as $status)
+                            @foreach($statusEmpleado as $status)
                                 <option value="{{$status->id}}">{{$status->nombre}}</option>
                             @endforeach
                         </select>
@@ -66,7 +66,7 @@
                         <label>Status</label>
                         <select name="status_cliente_id" class="form-control" data-msg="Status cliente">
                             <option value="" selected>Status (Cualquiera)</option>
-                            @foreach($statusCliente as $status)
+                            @foreach($statusEmpleado as $status)
                                 <option value="{{$status->id}}">{{$status->nombre}}</option>
                             @endforeach
                         </select>

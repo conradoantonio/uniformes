@@ -34,7 +34,6 @@
                             @if( auth()->user()->permisos()->where('permisos.alias', 'razones_editar')->exists() )
                             <a href="{{url('razones-sociales/form')}}" class="btn btn-success"> <i class="mdi mdi-open-in-new"></i> Nuevo registro</a>
                             @endif
-                            <a href="javascript:;" class="btn btn-info export-global-bill"> <i class="mdi mdi-file-excel"></i> Exportar adeudo global</a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -54,7 +53,7 @@
         // });
     });
 
-    // Abre el modal para filtrar el adeudo de los clientes de cada razón social
+    // Abre el modal para filtrar el adeudo de los empleados de cada razón social
     $('body').delegate('.generar-excel-facturas', 'click', function() {
         id = $(this).data('row-id');
         nombre = $(this).data('row-name');
@@ -62,12 +61,12 @@
         $('div#modal-excel-facturas-rs input[name=razon_social_id]').val(id);
         $('div#modal-excel-facturas-rs input[name=razon_social_nombre]').val(nombre);
 
-        var parent = '.div-clientes';
+        var parent = '.div-empleados';
         var select = 'select[name=cliente_id]';
         config = {
             "razon_social_id"  : id,
             "only_data"        : true,
-            "route"            : '{{url('clientes/filter')}}',
+            "route"            : '{{url('empleados/filter')}}',
             "parent"           : parent,
             "select"           : select,
             "dropdownParent"   : '#modal-excel-facturas-rs',
@@ -127,19 +126,19 @@
         window.location.href = url;
     });
 
-    //Recargará los clientes dependiendo de su status y razón social
+    //Recargará los empleados dependiendo de su status y razón social
     $('select[name=razon_social_id], select[name=status_cliente_id]').change(function() {
         console.log('hola');
         var razon_social_id = $('input[name=razon_social_id]').val();
         var status_cliente_id = $('select[name=status_cliente_id]').val();
-        var parent = '.div-clientes';
+        var parent = '.div-empleados';
         var select = 'select[name=cliente_id]';
         if ( razon_social_id ) {
             config = {
                 "razon_social_id"   : razon_social_id,
                 "status_cliente_id" : status_cliente_id,
                 "only_data"         : true,
-                "route"             : '{{url('clientes/filter')}}',
+                "route"             : '{{url('empleados/filter')}}',
                 "parent"            : parent,
                 "select"            : select,
                 "keepModal"         : true,

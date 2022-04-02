@@ -20,7 +20,7 @@ class Empleado extends Model
      */
     protected $fillable = [
         'razon_social_id', 'status_empleado_id', 'nombre', 'numero_empleado', 
-        'ife', 'domicilio', 'fecha_ingreso', 'fecha_baja', 
+        'ine', 'domicilio', 'fecha_ingreso', 'fecha_baja', 'observaciones'
     ];
 
     /**
@@ -38,7 +38,7 @@ class Empleado extends Model
      */
     public function status()
     {
-        return $this->belongsTo('App\StatusCliente', 'status_empleado_id');
+        return $this->belongsTo('App\StatusEmpleado', 'status_empleado_id');
     }
 
     /**
@@ -70,8 +70,8 @@ class Empleado extends Model
         ->when($filters['razon_social_id'] ?? null, function($query, $razon_social_id) {
             $query->where('razon_social_id', $razon_social_id);
         })
-        ->when($filters['status_cliente_id'] ?? null, function($query, $status_cliente_id) {
-            $query->where('status_cliente_id', $status_cliente_id);
+        ->when($filters['status_empleado_id'] ?? null, function($query, $status_empleado_id) {
+            $query->where('status_empleado_id', $status_empleado_id);
         })
         ->when($filters['empleado_id'] ?? null, function($query, $empleado_id) {
             $query->where('id', $empleado_id);

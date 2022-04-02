@@ -95,6 +95,7 @@ class ClientesController extends Controller
         $filters = [
             'user' => auth()->user(), 
         ];
+        
         $razones = RazonSocial::filter( $filters )->get();
 
         if ( $id ) {

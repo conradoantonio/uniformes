@@ -60,6 +60,16 @@
     </div>
     <div class="admin-sidebar-wrapper js-scrollbar">
         <ul class="menu">
+            <li class="menu-item {{ in_array($menu, ['Inicio']) ? 'active opened' : ''}}">
+                <a href="{{url('dashboard')}}" class="menu-link">
+                    <span class="menu-label">
+                        <span class="menu-name">Inicio</span>
+                    </span>
+                    <span class="menu-icon">
+                        <i class="icon-placeholder mdi mdi-view-dashboard-outline"></i>
+                    </span>
+                </a>
+            </li>
 
             @if( auth()->user()->permisos()->where('permisos.alias', 'razones_ver')->exists() )
             <li class="menu-item {{ in_array($menu, ['Razones sociales']) ? 'active opened' : ''}}">
@@ -74,7 +84,7 @@
             </li>
             @endif
             
-            @if( auth()->user()->permisos()->where('permisos.alias', 'clientes_ver')->exists() )
+            @if( auth()->user()->permisos()->where('permisos.alias', 'empleados_ver')->exists() )
             <li class="menu-item {{ in_array($menu, ['Empleados']) ? 'active opened' : ''}}">
                 <a href="#" class="open-dropdown menu-link">
                     <span class="menu-label">
@@ -85,13 +95,13 @@
                 <!--submenu-->
                 <ul class="sub-menu" style="{{ $menu == 'Empleados' ? 'display: block' : 'display: none'}};">
                     <li class="menu-item">
-                        <a href="{{url('clientes?s=activos')}}" class="menu-link">
+                        <a href="{{url('empleados?s=activos')}}" class="menu-link">
                             <span class="menu-label"><span class="menu-name {{ ( in_array($menu, ['Empleados']) && in_array($title, ['Empleados activos', 'Formulario empleados activo']) ) ? 'sub-ative' :'' }}">Activos</span></span>
                         </a>
-                        <a href="{{url('clientes?s=inactivos')}}" class="menu-link">
+                        <a href="{{url('empleados?s=inactivos')}}" class="menu-link">
                             <span class="menu-label"><span class="menu-name {{ ( in_array($menu, ['Empleados']) && in_array($title, ['Empleados inactivos', 'Formulario empleados inactivo']) ) ? 'sub-ative' :'' }}">Inactivos</span></span>
                         </a>
-                        <a href="{{url('clientes?s=pendientes')}}" class="menu-link">
+                        <a href="{{url('empleados?s=pendientes')}}" class="menu-link">
                             <span class="menu-label"><span class="menu-name {{ ( in_array($menu, ['Empleados']) && in_array($title, ['Empleados pendientes', 'Formulario empleados pendientes']) ) ? 'sub-ative' :'' }}">Pendientes</span></span>
                         </a>
                     </li>
@@ -132,6 +142,19 @@
                 <a href="{{url('pagos')}}" class="menu-link">
                     <span class="menu-label">
                         <span class="menu-name">Pagos</span>
+                    </span>
+                    <span class="menu-icon">
+                        <i class="icon-placeholder mdi mdi-tag-multiple"></i>
+                    </span>
+                </a>
+            </li>
+            @endif
+
+            @if( auth()->user()->permisos()->where('permisos.alias', 'articulos_ver')->exists() )
+            <li class="menu-item {{ in_array($menu, ['Artículos']) ? 'active opened' : ''}}">
+                <a href="{{url('articulos')}}" class="menu-link">
+                    <span class="menu-label">
+                        <span class="menu-name">Articulos</span>
                     </span>
                     <span class="menu-icon">
                         <i class="icon-placeholder mdi mdi-tag-multiple"></i>

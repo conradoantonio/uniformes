@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use Excel;
 
 use \App\Recibo;
-use \App\Cliente;
+use \App\Empleado;
 use \App\Factura;
 use \App\RazonSocial;
-use \App\StatusCliente;
+use \App\StatusEmpleado;
 
 use Illuminate\Http\Request;
 
@@ -26,13 +26,13 @@ class RazonesSocialesController extends Controller
             'user' => auth()->user(), 
         ];
         $items = RazonSocial::filter( $filters )->get();
-        $clientes = Cliente::filter( $filters )->get();
-        $statusCliente = StatusCliente::all();
+        $clientes = Empleado::filter( $filters )->get();
+        $statusEmpleado = StatusEmpleado::all();
 
         if ( $req->ajax() ) {
             return view('razones_sociales.table', compact('items'));
         }
-        return view('razones_sociales.index', compact('items', 'clientes', 'statusCliente', 'menu', 'title'));
+        return view('razones_sociales.index', compact('items', 'clientes', 'statusEmpleado', 'menu', 'title'));
     }
     
     /**
@@ -218,7 +218,7 @@ class RazonesSocialesController extends Controller
             $fechaFormateada = $factura->fecha_facturacion ? strftime('%d', strtotime($factura->fecha_facturacion)).' de '.strftime('%B', strtotime($factura->fecha_facturacion)). ' del '.strftime('%Y', strtotime($factura->fecha_facturacion)) : '';
 
             $rows [] = [
-                'Cliente'              => $factura->cliente->nombre.' ('.$factura->cliente->razon_social->nombre.')',
+                'Empleado'             => $factura->cliente->nombre.' ('.$factura->cliente->razon_social->nombre.')',
                 'Número / Folio'       => $factura->numero_factura,
                 'Importe'              => $factura->importe,
                 'Pagos adjuntados'     => $pagos,

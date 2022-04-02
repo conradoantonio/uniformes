@@ -152,69 +152,34 @@ class LoginController extends Controller
     {
         $data = new \stdClass();
         
-        #Total de clientes
-        $data->totalClientes = Empleado::filter($filters)->count();
+        // Total de empleados activos
+        $data->totalEmpleadosActivos = Empleado::filter($filters)
+        ->where('status_empleado_id', 1)
+        ->count();
 
-        #Total de facturas pagadas del periodo
-        $aux = $filters;
-        // dd($aux['fecha_promesa_inicio'], $aux['fecha_promesa_fin']);
-        $data->totalFacturasPagadasMes = Historial::filter($filters)
-        // ->whereYear('fecha_facturacion', date('Y'))
-        // ->whereMonth('fecha_facturacion', date('m'))
-        ->where('pagada', 1)
-        ->sum('importe');
+        // Total de empleados inactivos
+        $data->totalEmpleadosInactivos = Empleado::filter($filters)
+        ->where('status_empleado_id', 2)
+        ->count();
 
-        #Total de facturas NO pagadas del mes actual
-        $data->totalFacturasNOPagadasMes = Historial::filter($filters)
-        // ->whereYear('fecha_facturacion', date('Y'))
-        // ->whereMonth('fecha_facturacion', date('m'))
-        ->where('pagada', 0)
-        ->sum('importe');
+        // Total de empleados pendientes
+        $data->totalEmpleadosPendientes = Empleado::filter($filters)
+        ->where('status_empleado_id', 3)
+        ->count();
 
-        // Parche para que los modelos de Recibo filtren bien
-        $aux['fecha_inicio'] = $aux['fecha_promesa_inicio'];
-        $aux['fecha_fin'] = $aux['fecha_promesa_fin'];
+        // Total empleados
+        $data->totalEmpleados = $data->totalEmpleadosActivos + $data->totalEmpleadosInactivos + $data->totalEmpleadosPendientes;
 
-        #Total de notas de crédito del mes actual
-        $data->totalNotasCreditoMes = Recibo::filter($aux)
-        // ->whereYear('fecha_pago', date('Y'))
-        // ->whereMonth('fecha_pago', date('m'))
+        // Total de artículos entregados del periodo
+        $data->totalArticulosEntregados = Historial::filter($filters)
         ->where('tipo_recibo_id', 1)
-        ->sum('importe');
+        ->sum('cantidad');
 
-        #Total de notas de crédito del mes actual
-        $data->totalPagosMes = Recibo::filter($aux)
-        // ->whereYear('fecha_pago', date('Y'))
-        // ->whereMonth('fecha_pago', date('m'))
+        // Total de artículos recibidos del periodo
+        $data->totalArticulosRecibidos = Historial::filter($filters)
         ->where('tipo_recibo_id', 2)
-        ->sum('importe');
+        ->sum('cantidad');
 
-        // Estos filtros no aplican para los siguientes datos
-        $aux['fecha_promesa_inicio'] = $aux['fecha_promesa_fin'] = $aux['fecha_inicio'] = $aux['fecha_fin'] = null;
-        #Total de facturas NO pagadas de todo el tiempo
-        $data->totalFacturasNOPagadas = Historial::filter($aux)
-        ->where('pagada', 0)
-        ->sum('importe');
-
-        #Total de facturas normales
-        $data->totalFacturasNormales = Historial::filter($aux)
-        ->where('status_id', 1)
-        ->count();
-
-        #Total de facturas morosas
-        $data->totalFacturasMorosas = Historial::filter($aux)
-        ->where('status_id', 2)
-        ->count();
-
-        #Total de facturas prelegales
-        $data->totalFacturasPrelegales = Historial::filter($aux)
-        ->where('status_id', 3)
-        ->count();
-
-        #Total de facturas legales
-        $data->totalFacturasLegales = Historial::filter($aux)
-        ->where('status_id', 4)
-        ->count();
 
         return json_encode($data);
     }
