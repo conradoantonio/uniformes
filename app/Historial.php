@@ -19,7 +19,7 @@ class Historial extends Model
      * @var array
      */
     protected $fillable = [
-        'tipo_recibo_id', 'empleado_id', 'articulo_id', 'status_articulo_id', 
+        'tipo_historial_id', 'empleado_id', 'articulo_id', 'status_articulo_id', 
         'talla_id', 'color', 'cantidad', 'fecha_entrega', 'notas'
     ];
 
@@ -29,7 +29,7 @@ class Historial extends Model
      */
     public function tipo()
     {
-        return $this->belongsTo('App\TipoRecibo', 'tipo_recibo_id');
+        return $this->belongsTo('App\TipoHistorial', 'tipo_historial_id');
     }
 
     /**
@@ -78,8 +78,8 @@ class Historial extends Model
                 $query->whereIn('razon_social_id', $user->razones->pluck('id'));
             });
         })
-        ->when($filters['tipo_id'] ?? null, function($query, $tipo_id) {
-            $query->where('tipo_id', $tipo_id);
+        ->when($filters['tipo_recibo_id'] ?? null, function($query, $tipo_recibo_id) {
+            $query->where('tipo_recibo_id', $tipo_recibo_id);
         })
         ->when($filters['empleado_id'] ?? null, function($query, $empleado_id) {
             $query->where('empleado_id', $empleado_id);

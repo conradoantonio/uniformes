@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Excel;
 
+use \App\Talla;
 use \App\Empleado;
 use \App\Articulo;
 use \App\Historial;
 use \App\RazonSocial;
+use \App\StatusArticulo;
 use \App\StatusEmpleado;
 
 use Illuminate\Http\Request;
@@ -41,6 +43,23 @@ class EmpleadosController extends Controller
         }
         return view('empleados.index', compact('items', 'razones', 'status', 'statusEmpleado', 'menu', 'title'));
     }
+
+    /**
+     * Filter user franchise acording to the filters given by user.
+     *
+     */
+    public function filter(Request $req)
+    {
+        $req->request->add([ 'user' => auth()->user() ]);
+
+        $items = Empleado::filter( $req->all() )->orderBy('id', 'desc')->get();
+
+        if ( $req->only_data ) {
+            return response(['msg' => 'Empleados enlistados a continuación', 'status' => 'success', 'data' => $items, 'total' => count($items)], 200);
+        }
+
+        return view('empleados.table', compact(['items']));
+    }
     
     /**
      * Show the form for creating/editing a user franchise.
@@ -62,6 +81,49 @@ class EmpleadosController extends Controller
             $item = Empleado::filter( $filters )->where('id', $id)->first();
         }
         return view('empleados.form', compact(['item', 'razones', 'menu', 'title']));
+    }
+
+    /**
+     * Show the form for creating/editing a user franchise.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function formUniformes($id = 0)
+    {
+        $title = "Formulario de asignación de uniformes";
+        $menu = "Empleados";
+        $empleado = null;
+        $filters = [
+            'user' => auth()->user(), 
+        ];
+        
+        $tallas = Talla::all();
+        $articulos = Articulo::all();
+        $status = StatusArticulo::all();
+
+        if ( $id ) {
+            $empleado = Empleado::filter( $filters )->where('id', $id)->first();
+        }
+        return view('empleados.formArticulos', compact(['empleado', 'articulos', 'tallas', 'status', 'menu', 'title']));
+    }
+
+    /**
+     * Shows historic
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function verHistorico(Request $req)
+    {
+        $items = Historial::with(['tipo', 'articulo', 'status', 'talla'])
+        ->filter( $req->all() )
+        ->get();
+        // ->where('id', $req->empleado_id)
+
+        foreach ($items as $item) {
+            $item->fechaFormateada = strftime('%d', strtotime($item->fecha_entrega)).' de '.strftime('%B', strtotime($item->fecha_entrega)). ' del '.strftime('%Y', strtotime($item->fecha_entrega));
+        }
+
+        return response(['msg' => 'Información de factura enlistada a continuación', 'status' => 'success', 'data' => $items], 200);
     }
 
     /**
@@ -155,13 +217,21 @@ class EmpleadosController extends Controller
     public function delete(Request $req)
     {
         $msg = count($req->ids) > 1 ? 'los registros' : 'el registro';
-        $items = Empleado::whereIn('id', $req->ids)
-        ->delete();
+        $item = Empleado::whereIn('id', $req->ids)
+        ->first();
 
-        if ( $items ) {
-            return response(['msg' => 'Éxito eliminando '.$msg, 'url' => url('empleados'), 'status' => 'success'], 200);
+        if ( $item ) {
+            $item->delete();
+
+            $url = url('empleados?s=activos');
+        
+            if( $item->status_empleado_id == 1 ) { $url = url('empleados?s=activos'); }
+            elseif( $item->status_empleado_id == 2 ) { $url = url('empleados?s=inactivos'); }
+            elseif( $item->status_empleado_id == 3 ) { $url = url('empleados?s=pendientes'); }
+
+            return response(['msg' => 'Éxito eliminando '.$msg, 'url' => $url, 'status' => 'success'], 200);
         } else {
-            return response(['msg' => 'Error al cambiar el status de '.$msg, 'status' => 'error', 'url' => url('empleados')], 404);
+            return response(['msg' => 'Error al cambiar el status de '.$msg, 'status' => 'error'], 404);
         }
     }
 
@@ -172,11 +242,13 @@ class EmpleadosController extends Controller
      */
     public function generarHistorico(Request $req)
     {
-        $rows = array();
-        $req->request->add([ 'user' => auth()->user(), 'pagada' => 0, 'no_canceladas' => true ]);
-        $Articulos = Articulo::filter( $req->all() )->orderBy('fecha_Articulocion', 'desc')->get();
+        $req->request->add([ 'user' => auth()->user() ]);
 
-        $totalArticulos = $totalPagos = 0;
+        $rows = array();
+        $empleado = Empleado::find($req->cliente_id);
+
+        $items = Historial::filter( $req->all() )->get();
+        $totalEntregados = $totalRecibidos = 0;
         $fechaInicioFormateada = 'N/A';
         $fechaFinFormateada = 'N/A'; 
 
@@ -190,55 +262,75 @@ class EmpleadosController extends Controller
 
         $periodo = $fechaInicioFormateada.' - '.$fechaFinFormateada;
 
-        foreach ( $Articulos as $Articulo ) {
-            $fechaFormateada = 'N/A';
-            $pagos = 0;
+        foreach ( $items as $item ) {
 
-            $pagos = Recibo::where('Articulo_id', $Articulo->id)->sum('importe');
-            $totalArticulos += $Articulo->importe;
-            $totalPagos += $pagos;
-            $fechaFormateada = $Articulo->fecha_Articulocion ? strftime('%d', strtotime($Articulo->fecha_Articulocion)).' de '.strftime('%B', strtotime($Articulo->fecha_Articulocion)). ' del '.strftime('%Y', strtotime($Articulo->fecha_Articulocion)) : '';
+            $tipo = $fechaEntrega = $fechaFormateada = '';
+            $cantidad = 0;
+
+            // Factura
+            if ( $item->tipo_recibo_id == 1 ) { // Entrega
+
+                $tipo  = 'Entrega';
+                $totalEntregados += $item->cantidad;
+
+            } else if ( $item->tipo_recibo_id == 2 ) { // Recibido
+
+                $tipo  = 'Recibido';
+                $totalRecibidos += $item->cantidad;
+
+            }
+            
+            $fechaEntrega = $item->fecha_entrega;
+            $fechaFormateada = strftime('%d', strtotime($fechaEntrega)).' de '.strftime('%B', strtotime($fechaEntrega)). ' del '.strftime('%Y', strtotime($fechaEntrega));
 
             $rows [] = [
-                'Empleado'             => $Articulo->cliente->nombre.' ('.$Articulo->cliente->razon_social->nombre.')',
-                'Número / Folio'       => $Articulo->numero_Articulo,
-                'Importe'              => $Articulo->importe,
-                'Pagos adjuntados'     => $pagos,
-                'Balance'              => $Articulo->importe - $pagos,
-                'Fecha de Articuloción' => $fechaFormateada,
-                'Comentario'           => $Articulo->comentarios_adicionales,
+                'Empleado'          => $empleado->nombre,
+                'No. empleado'      => $empleado->numero_empleado,
+                'Artículo'          => $item->articulo,
+                'Status artículo'   => $item->status ? $item->status->nombre : 'N/A',
+                'Talla'             => $item->talla ? $item->talla->nombre : 'N/A',
+                'Color'             => $item->color ?? 'N/A',
+                'Cantidad'          => $item->cantidad ?? 'N/A',
+                'Fecha de entrega'  => $fechaEntrega ?? 'N/A',
+                'Notas adicionales' => $item->notas,
             ];
         }
 
-        Excel::create('Listado de Articulos', function($excel) use ($rows, $totalArticulos, $totalPagos, $periodo) {
-            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalArticulos, $totalPagos, $periodo) {
+        Excel::create('Histórico', function($excel) use ($rows, $totalEntregados, $totalRecibidos, $empleado, $periodo) {
+            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalEntregados, $totalRecibidos, $empleado, $periodo) {
 
-                // $sheet->cell('A1', function($cell) use ($cliente) {
-                //     if ( $cliente ) {
-                //         $cell->setFontWeight('bold');
-                //         $cell->setFontSize(12);
-                //         $cell->setValue('Razón social: '.$cliente->razon_social->nombre);
-                //     }
-                // });
+                $sheet->cell('A1', function($cell) use ($empleado) {
+                    if ( $empleado ) {
+                        $cell->setFontWeight('bold');
+                        $cell->setFontSize(12);
+                        $cell->setValue('Empleado: '.$empleado->nombre);
+                    }
+                });
 
-                $sheet->cell('A1', function($cell) use($periodo) {
+                $sheet->cell('A2', function($cell) use($periodo) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
                     $cell->setValue('Periodo: '.$periodo);
                 });
 
-                $sheet->cell('A2', function($cell) use ($totalArticulos, $totalPagos) {
+                $sheet->cell('A3', function($cell) use ($totalEntregados) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
-                    $cell->setValue('Balance: $'.number_format( $totalArticulos - $totalPagos, 2));
+                    $cell->setValue('Artículos entregados: #'.number_format( $totalEntregados, 0));
                 });
 
-                $sheet->cells('A:G', function($cells) {
+                $sheet->cell('A3', function($cell) use ($totalRecibidos) {
+                    $cell->setFontWeight('bold');
+                    $cell->setFontSize(12);
+                    $cell->setValue('Artículos recibidos: #'.number_format( $totalRecibidos, 0));
+                });
+
+                $sheet->cells('A:I', function($cells) {
                     $cells->setAlignment('left');
                     $cells->setValignment('center');
                 });
 
-                $sheet->cells('A5:G5', function($cells) {
+                $sheet->cells('A5:I5', function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('center');
                     $cells->setFontWeight('bold');
@@ -246,7 +338,6 @@ class EmpleadosController extends Controller
                 });
 
                 $sheet->fromArray($rows, null, 'A5', true);
-                // $sheet->setAutoFilter('A5:E5');
             });
         })->export('xlsx');
     }

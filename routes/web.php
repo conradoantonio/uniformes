@@ -78,14 +78,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', 'EmpleadosController@index');
         Route::get('reload', 'EmpleadosController@index');
         Route::get('form/{id?}', 'EmpleadosController@form')->where('id', '[0-9]+')->middleware('permission:empleados_editar');
+        Route::get('asignar-uniformes/{id?}', 'EmpleadosController@formUniformes')->where('id', '[0-9]+')->middleware('permission:empleados_editar');
         Route::get('generar-historico', 'EmpleadosController@generarHistorico');
-        Route::get('{cliente_id}/exportar/pdf/{vista}', 'EmpleadosController@generarPDF');
+        Route::post('ver-historico', 'EmpleadosController@verHistorico');
         Route::post('filter', 'EmpleadosController@filter');
-        Route::post('show', 'EmpleadosController@show');
         Route::post('save', 'EmpleadosController@save');
         Route::post('change-status', 'EmpleadosController@changeStatus');
         Route::post('update', 'EmpleadosController@update');
         Route::post('delete', 'EmpleadosController@delete');
+    });
+
+    #Registro de histórico de artículos
+    Route::middleware(['permission:empleados_editar'])->prefix('historicos')->group(function () {
+        Route::get('/', 'HistoricosController@index');
+        Route::post('delete', 'HistoricosController@delete');
     });
 
     #Artículos

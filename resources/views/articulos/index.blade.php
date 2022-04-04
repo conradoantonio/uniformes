@@ -6,7 +6,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8 m-auto text-white p-t-40 p-b-90">
-                    <h1>articulos</h1>
+                    <h1>Articulos</h1>
                     <p class="opacity-75">
                         Aquí podrá visualizar y modificar las articulos creadas.
                     </p>

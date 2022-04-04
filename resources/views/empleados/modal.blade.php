@@ -13,8 +13,17 @@
                     </div>
 
                     <div class="form-group col-md-12">
-                        <label>empleado</label>
-                        <input type="text" class="form-control" disabled name="empleado_name" data-msg="empleado">
+                        <label>Empleado</label>
+                        <input type="text" class="form-control" disabled name="empleado_name" data-msg="Empleado">
+                    </div>
+
+                    <div class="form-group col-md-12">
+                        <label>Tipo de registro</label>
+                        <select class="form-control" name="tipo_recibo_id" data-msg="Tipo de recibo">
+                            <option value="">Cualquiera</option>
+                            <option value="1">Entrega</option>
+                            <option value="2">Recibo</option>
+                        </select>
                     </div>
                     
                     <div class="form-group col-md-12">
@@ -72,6 +81,48 @@
                     <button type="submit" class="btn btn-success save" data-target-id="form-change-status">Cambiar status</button>
                 </div>
             </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade mostrar-historico" tabindex="-1" role="dialog" aria-labelledby="label-title" data-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="label-title">Histórico de artículos</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row text-left">
+                    <div class="col-md-12">
+                        <ul class="list-group">
+                            <li class="list-group-item active">Registro</li>
+                            <li class="list-group-item">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-sm historico text-center">
+                                        <thead>
+                                            <th class="align-middle">Tipo</th>
+                                            <th class="align-middle">Artículo</th>
+                                            <th class="align-middle">Status</th>
+                                            <th class="align-middle">Talla</th>
+                                            <th class="align-middle">Color</th>
+                                            <th class="align-middle">Cantidad</th>
+                                            <th class="align-middle">Fecha entrega</th>
+                                            <th class="align-middle">Notas</th>
+                                            <th class="align-middle">Acciones</th>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->

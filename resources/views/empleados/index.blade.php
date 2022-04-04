@@ -56,7 +56,7 @@
                                     </div>
                                     <div class="no-pad col-md-4 div-empleados" style="text-align: left;">
                                         <select id="empleado_id" name="empleado_id" class="form-control not-empty select2" data-msg="empleados">
-                                            <option value="" selected>empleados (Cualquiera)</option>
+                                            <option value="" selected>Empleados (Cualquiera)</option>
                                         </select>
                                     </div>
                                     <div class="no-pad col-md-4 d-none">
@@ -94,8 +94,68 @@
         $('div#modal-historico').modal();
     });
 
-     //Cambiar status del empleado
-     $('body').delegate('.cambiar-status', 'click', function() {
+    //Genera el estado de cuenta
+    $('body').delegate('.ver-historico', 'click', function() {
+        id     = $(this).data('row-id');
+        nombre = $(this).data('row-name');
+
+        // $('div.mostrar-historico input[name=empleado_id]').val(id);
+        // $('div.mostrar-historico input[name=empleado_name]').val(nombre);
+        
+        config = {
+            "empleado_id" : id,
+            "route"       : '{{url('empleados/ver-historico')}}',
+            "callback"    : 'fillHistoricTable',
+        }
+
+        loadingMessage('Espere un momento...');
+        ajaxSimple(config);
+
+        $('div.mostrar-historico').modal();
+    });
+
+    // Se muestra el histórico
+    function fillHistoricTable(data, config) {
+        let rows = data.data;
+        $('table.historico tbody').children('tr').remove();
+
+        if ( rows.length ) {
+            for ( var key in rows ) {
+                let tipoHtml   = '<span class="badge badge-'+( rows[key].tipo.clase )+'">'+( rows[key].tipo.nombre )+'</span>';
+                let statusHtml = '<span class="badge badge-'+( rows[key].status ? rows[key].status.clase : 'warning' )+'">'+( rows[key].status ? rows[key].status.nombre : 'N/A' )+'</span>';
+
+                $('table.historico tbody').append(
+                    '<tr class="item registro-'+rows[key].id+'">'+
+                        '<td class="align-middle">'+tipoHtml+'</td>'+
+                        '<td class="align-middle">'+rows[key].articulo.nombre+'</td>'+
+                        '<td class="align-middle">'+statusHtml+'</td>'+
+                        '<td class="align-middle">'+( rows[key].talla ? rows[key].talla.nombre : 'N/A' )+'</td>'+
+                        '<td class="align-middle">'+( rows[key].color ?? 'N/A' )+'</td>'+
+                        '<td class="align-middle">'+( rows[key].cantidad ?? 'N/A' )+'</td>'+
+                        '<td class="align-middle">'+( rows[key].fechaFormateada ?? 'N/A' )+'</td>'+
+                        '<td class="align-middle">'+( rows[key].notas ?? 'N/A' )+'</td>'+
+                        '<td class="align-middle">'+
+                            '<button class="btn btn-danger btn-sm delete-historic" data-row-id='+rows[key].id+' data-toggle="tooltip" data-placement="top" title="Eliminar registro">'+
+                                '<i class="mdi mdi-close-circle"></i>'+
+                            '</button>'+
+                        '</td>'+
+                    '</tr>'
+                );
+            }
+        } else {
+            $('table.historico tbody').append(
+                '<tr>'+
+                    '<td class="align-middle" colspan="9">Sin registros disponibles</td>'+
+                '</tr>'
+            );
+        }
+
+
+        $('div.mostrar-historico').modal();
+    }
+
+    //Cambiar status del empleado
+    $('body').delegate('.cambiar-status', 'click', function() {
         id = $(this).data('row-id');
         nombre = $(this).data('row-name');
         url = $('div.general-info').data('url');
@@ -108,16 +168,54 @@
     $('body').delegate('.btn-generar-historico', 'click', function() {
         url = baseUrl.concat('/empleados/generar-historico');
 
-        empleado_id = $('div#modal-historico input[name=empleado_id]').val();
+        empleado_id  = $('div#modal-historico input[name=empleado_id]').val();
         fecha_inicio = $('div#modal-historico input[name=fecha_inicio]').val();
-        fecha_fin = $('div#modal-historico input[name=fecha_fin]').val();
+        fecha_fin    = $('div#modal-historico input[name=fecha_fin]').val();
+        tipo_id      = $('div#modal-historico input[name=tipo_recibo_id]').val();
 
         url = url.concat('?empleado_id='+empleado_id);
+        url = url.concat('&tipo_recibo_id='+tipo_id);
         url = url.concat('&fecha_inicio='+fecha_inicio);
         url = url.concat('&fecha_fin='+fecha_fin);
         // console.log(url);
         window.location.href = url;
     });
+
+    //Send a request for a single delete
+    $('body').delegate('.delete-historic','click', function() {
+        let id = $(this).data('row-id');
+
+        swal({
+            title: 'Se dará de baja el registro con el ID '+id+', ¿Está seguro de continuar?',
+            icon: 'warning',
+            buttons:["Cancelar", "Aceptar"],
+            dangerMode: true,
+        }).then((accept) => {
+            if ( accept ){
+                config = {
+                    'route'     : '{{url('historicos/delete')}}',
+                    'id'        : id,
+                    'keepModal' : true,
+                    'callback'  : 'removeHistoric',
+                }
+                loadingMessage();
+                ajaxSimple(config);
+            }
+        }).catch(swal.noop);
+    });
+
+    // Remueve el item, si ya no hay registros en la tabla, se especifica que no hay elementos por mostrar
+    function removeHistoric(data, config) {
+        $('tr.registro-'+config['id']).remove();
+        
+        if ( $('table.historico tbody').children('tr.item').length == 0 ) { 
+            $('table.historico tbody').append(
+                '<tr>'+
+                    '<td class="align-middle" colspan="9">Sin registros disponibles</td>'+
+                '</tr>'
+            );
+        }
+    }
 
     //Recargará la lista de empleados cada que se seleccione una razón social distinta
     $('select[name=razon_social_id]').change(function() {

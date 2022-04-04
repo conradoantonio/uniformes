@@ -6,7 +6,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 m-auto text-white p-t-20 p-b-90">
-                    <h1>Factura</h1>
+                    <h1>Artículo</h1>
                 </div>
                 <div class="col-md-6 m-auto text-white p-t-20 p-b-90">
                     <nav aria-label="breadcrumb">
@@ -35,7 +35,7 @@
                                 </div>
                                 <div class="form-group col-md-12">
                                     <label>Artículo*</label>
-                                    <input type="text" class="form-control not-empty" value="{{$item ? $item->nombre : ''}}" name="nombre" data-msg="Número de factura">
+                                    <input type="text" class="form-control not-empty" value="{{$item ? $item->nombre : ''}}" name="nombre" data-msg="Artículo">
                                 </div>
                                 <div class="form-group col-md-12">
                                     <label>Descripción</label>
