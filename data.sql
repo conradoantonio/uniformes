@@ -63,7 +63,7 @@ CREATE TABLE `empleados` (
 
 /*Data for the table `empleados` */
 
-insert  into `empleados`(`id`,`razon_social_id`,`status_empleado_id`,`nombre`,`numero_empleado`,`ine`,`domicilio`,`fecha_ingreso`,`fecha_baja`,`observaciones`,`created_at`,`updated_at`,`deleted_at`) values (1,1,1,'ADOLFO LÓPEZ MATEOS','10004223','3317528811','AVENIDA SIEMPRE VIVA #4320','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2021-08-30 12:33:50',NULL),(2,1,1,'MANUEL ROSALES','10004329','3318890674/3337701057','FEDERALISMO GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2021-08-30 12:33:50',NULL),(3,1,1,'ALDEBARÁN VILLALOBOS','10001318','3334910477/3323841685','AV. LA CAÑA No. 3065, COL. LA NOGALERA, C.P. 44490, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-03 22:09:05',NULL),(4,1,2,'MARCO ANTONIO SOLIS','10004544','4421770192','AV. CECYT No. 100, COL. NUEVO FUERTE, C.P. 47899, OCOTLAN, JALISCO','2022-03-30','2022-04-03','Hola','2021-08-30 12:33:50','2022-04-03 22:49:08',NULL),(5,1,1,'CERO RIESGO SA DE CV','10000421','3338111115','CALLE 8, COL. COLON INDUSTRIAL, C.P. 44940, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-03 22:49:18',NULL),(6,1,3,'RICARDO LÓPEZ','10003121','3338129508','AV. ENRIQUE DIAZ DE LEON No. 783. COL. MODERNA, C.P. 44190, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-03 22:49:48',NULL);
+insert  into `empleados`(`id`,`razon_social_id`,`status_empleado_id`,`nombre`,`numero_empleado`,`ine`,`domicilio`,`fecha_ingreso`,`fecha_baja`,`observaciones`,`created_at`,`updated_at`,`deleted_at`) values (1,1,1,'ADOLFO LÓPEZ MATEOS','10004223','3317528811','AVENIDA SIEMPRE VIVA #4320','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2021-08-30 12:33:50',NULL),(2,1,1,'MANUEL ROSALES','10004329','3318890674/3337701057','FEDERALISMO GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2021-08-30 12:33:50',NULL),(3,1,1,'ALDEBARÁN VILLALOBOS','10001318','3334910477/3323841685','AV. LA CAÑA No. 3065, COL. LA NOGALERA, C.P. 44490, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-03 22:09:05',NULL),(4,1,2,'MARCO ANTONIO SOLIS','10004544','4421770192','AV. CECYT No. 100, COL. NUEVO FUERTE, C.P. 47899, OCOTLAN, JALISCO','2022-03-30','2022-04-03','Hola','2021-08-30 12:33:50','2022-04-03 22:49:08',NULL),(5,4,1,'ALONDRA BELTRÁN','10000421','3338111115','CALLE 8, COL. COLON INDUSTRIAL, C.P. 44940, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-08 01:06:15',NULL),(6,1,3,'RICARDO LÓPEZ','10003121','3338129508','AV. ENRIQUE DIAZ DE LEON No. 783. COL. MODERNA, C.P. 44190, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-03 22:49:48',NULL);
 
 /*Table structure for table `historial` */
 
@@ -93,11 +93,11 @@ CREATE TABLE `historial` (
   CONSTRAINT `historial_ibfk_3` FOREIGN KEY (`status_articulo_id`) REFERENCES `status_articulo` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `historial_ibfk_4` FOREIGN KEY (`talla_id`) REFERENCES `tallas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `historial_ibfk_5` FOREIGN KEY (`tipo_historial_id`) REFERENCES `tipo_historial` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=828 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=835 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `historial` */
 
-insert  into `historial`(`id`,`tipo_historial_id`,`empleado_id`,`articulo_id`,`status_articulo_id`,`talla_id`,`color`,`cantidad`,`fecha_entrega`,`notas`,`created_at`,`updated_at`) values (823,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(824,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(825,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(826,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(827,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25');
+insert  into `historial`(`id`,`tipo_historial_id`,`empleado_id`,`articulo_id`,`status_articulo_id`,`talla_id`,`color`,`cantidad`,`fecha_entrega`,`notas`,`created_at`,`updated_at`) values (823,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(824,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(825,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(826,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(827,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(828,1,5,2,3,1,'Gris',9,'2022-04-21','Lorem ipsum','2022-04-07 23:45:37','2022-04-07 23:45:37'),(829,2,5,1,1,1,'Blanco',10,'2022-04-07','Lorem ipsum','2022-04-07 23:48:31','2022-04-07 23:48:31'),(830,1,5,2,2,2,'Blanco',1,'2022-04-07','Lorem ipsum','2022-04-07 23:48:31','2022-04-07 23:48:31'),(831,1,5,1,1,2,'Blanca',2,'2022-04-07','Lorem','2022-04-07 23:49:49','2022-04-07 23:49:49'),(832,2,5,4,3,1,'Negras',2,'2022-04-07','Lorem i´sum','2022-04-07 23:49:49','2022-04-07 23:49:49'),(833,1,5,1,1,2,'Blanca',2,'2022-04-07','Lorem','2022-04-07 23:54:32','2022-04-07 23:54:32'),(834,2,5,4,3,1,'Negras',2,'2022-04-07','Lorem i´sum','2022-04-07 23:54:32','2022-04-07 23:54:32');
 
 /*Table structure for table `modulos` */
 
@@ -260,7 +260,7 @@ CREATE TABLE `tallas` (
 
 /*Data for the table `tallas` */
 
-insert  into `tallas`(`id`,`nombre`,`created_at`,`updated_at`) values (1,'Teléfono','2022-03-31 00:08:28','2022-03-31 00:08:28'),(2,'Whatsapp','2022-03-31 00:08:28','2022-03-31 00:08:28'),(3,'Correo','2022-03-31 00:08:28','2022-03-31 00:08:28');
+insert  into `tallas`(`id`,`nombre`,`created_at`,`updated_at`) values (1,'Chica','2022-03-31 00:08:28','2022-03-31 00:08:28'),(2,'Mediana','2022-03-31 00:08:28','2022-03-31 00:08:28'),(3,'Grande','2022-03-31 00:08:28','2022-03-31 00:08:28');
 
 /*Table structure for table `tipo_historial` */
 
@@ -269,6 +269,7 @@ DROP TABLE IF EXISTS `tipo_historial`;
 CREATE TABLE `tipo_historial` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
+  `descripcion` varchar(50) NOT NULL,
   `clase` varchar(100) NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -277,7 +278,7 @@ CREATE TABLE `tipo_historial` (
 
 /*Data for the table `tipo_historial` */
 
-insert  into `tipo_historial`(`id`,`nombre`,`clase`,`created_at`,`updated_at`) values (1,'Entrega','info','2021-06-03 18:03:59','2021-06-03 18:03:59'),(2,'Recibo','success','2021-06-03 18:03:59','2021-06-03 18:03:59');
+insert  into `tipo_historial`(`id`,`nombre`,`descripcion`,`clase`,`created_at`,`updated_at`) values (1,'Entregado','Entregado al empleado','info','2021-06-03 18:03:59','2021-06-03 18:03:59'),(2,'Recibo','Devueltos por empleado','success','2021-06-03 18:03:59','2021-06-03 18:03:59');
 
 /*Table structure for table `users` */
 

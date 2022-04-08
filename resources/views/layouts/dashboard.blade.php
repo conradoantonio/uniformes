@@ -35,7 +35,7 @@
                         <h4>Bienvenido {{auth()->user()->fullname}}.</h4>
                     </div>
                     
-                    <div class="col-md-12 text-center">
+                    <div class="col-md-12 text-center d-none">
                         <div class="card">
                             <div class="card-header">
                                 <div class="col-md-12">

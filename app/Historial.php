@@ -38,7 +38,7 @@ class Historial extends Model
      */
     public function empleado()
     {
-        return $this->belongsTo('App\Empleado', 'empleado_id');
+        return $this->belongsTo('App\Empleado', 'empleado_id')->withTrashed();
     }
 
     /**
@@ -47,7 +47,7 @@ class Historial extends Model
      */
     public function articulo()
     {
-        return $this->belongsTo('App\Articulo', 'articulo_id');
+        return $this->belongsTo('App\Articulo', 'articulo_id')->withTrashed();
     }
 
     /**
@@ -76,6 +76,16 @@ class Historial extends Model
         $query->when($filters['user'] ?? null, function($query, $user) use($filters) {
             $query->whereHas('empleado', function($query) use($user) {
                 $query->whereIn('razon_social_id', $user->razones->pluck('id'));
+            });
+        })
+        ->when($filters['razon_social_id'] ?? null, function($query, $razon_social_id) {
+            $query->whereHas('empleado', function($query) use($razon_social_id) {
+                $query->where('razon_social_id', $razon_social_id);
+            });
+        })
+        ->when($filters['status_empleado_id'] ?? null, function($query, $status_empleado_id) {
+            $query->whereHas('empleado', function($query) use($status_empleado_id) {
+                $query->where('status_empleado_id', $status_empleado_id);
             });
         })
         ->when($filters['tipo_historial_id'] ?? null, function($query, $tipo_historial_id) {
