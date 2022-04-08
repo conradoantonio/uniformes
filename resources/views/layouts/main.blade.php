@@ -109,34 +109,6 @@
             </li>
             @endif
 
-            @if( auth()->user()->permisos()->where('permisos.alias', 'facturas_ver')->exists() )
-            <li class="menu-item {{ in_array($menu, ['Facturas']) ? 'active opened' : ''}}">
-                <a href="#" class="open-dropdown menu-link">
-                    <span class="menu-label">
-                        <span class="menu-name">Facturas<span class="menu-arrow"></span></span>
-                    </span>
-                    <span class="menu-icon"><i class="icon-placeholder mdi mdi-file-document"></i></span>
-                </a>
-                <!--submenu-->
-                <ul class="sub-menu" style="{{ $menu == 'Facturas' ? 'display: block' : 'display: none'}};">
-                    <li class="menu-item">
-                        <a href="{{url('facturas?s=activos')}}" class="menu-link">
-                            <span class="menu-label"><span class="menu-name {{ ( in_array($menu, ['Facturas']) && in_array($title, ['Facturas - activos', 'Formulario factura activo']) ) ? 'sub-ative' :'' }}">Activos</span></span>
-                        </a>
-                        <a href="{{url('facturas?s=inactivos')}}" class="menu-link">
-                            <span class="menu-label"><span class="menu-name {{ ( in_array($menu, ['Facturas']) && in_array($title, ['Facturas - inactivos', 'Formulario factura inactivo']) ) ? 'sub-ative' :'' }}">Inactivos</span></span>
-                        </a>
-                        <a href="{{url('facturas?s=legales')}}" class="menu-link">
-                            <span class="menu-label"><span class="menu-name {{ ( in_array($menu, ['Facturas']) && in_array($title, ['Facturas - legales', 'Formulario factura legal']) ) ? 'sub-ative' :'' }}">Legales</span></span>
-                        </a>
-                        <a href="{{url('facturas?s=venados')}}" class="menu-link">
-                            <span class="menu-label"><span class="menu-name {{ ( in_array($menu, ['Facturas']) && in_array($title, ['Facturas - venados', 'Formulario factura venado']) ) ? 'sub-ative' :'' }}">Venados</span></span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            @endif
-
             @if( auth()->user()->permisos()->where('permisos.alias', 'pagos_ver')->exists() )
             <li class="menu-item {{ in_array($menu, ['Pagos']) ? 'active opened' : ''}}">
                 <a href="{{url('pagos')}}" class="menu-link">
