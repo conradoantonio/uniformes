@@ -66,7 +66,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', 'RazonesSocialesController@index');
         Route::get('form/{id?}', 'RazonesSocialesController@form')->where('id', '[0-9]+')->middleware('permission:razones_editar');
         Route::get('excel/export', 'RazonesSocialesController@export');
-        Route::get('excel/export/bills', 'RazonesSocialesController@exportBills');
+        Route::get('excel/export/historic', 'RazonesSocialesController@exportHistoric');
         Route::post('save', 'RazonesSocialesController@save');
         Route::post('change-status', 'RazonesSocialesController@changeStatus');
         Route::post('update', 'RazonesSocialesController@update');

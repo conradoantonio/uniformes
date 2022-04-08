@@ -164,7 +164,7 @@ trait GeneralFunctions
 
     /**
      * Edita el historial de transacciones de un cliente
-     * @params $historial, cliente nuevo, item (factura, pago, notas de crédito), $typable, fecha nueva
+     * @params $historial, cliente nuevo, item, pago, notas de crédito), $typable, fecha nueva
      *
      */
     public function editarHistorial(Historial $historial, Cliente $cliente, $item, $typable, $fecha_nueva) 

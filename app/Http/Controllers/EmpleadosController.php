@@ -123,7 +123,7 @@ class EmpleadosController extends Controller
             $item->fechaFormateada = strftime('%d', strtotime($item->fecha_entrega)).' de '.strftime('%B', strtotime($item->fecha_entrega)). ' del '.strftime('%Y', strtotime($item->fecha_entrega));
         }
 
-        return response(['msg' => 'Información de factura enlistada a continuación', 'status' => 'success', 'data' => $items], 200);
+        return response(['msg' => 'Información de historial enlistada a continuación', 'status' => 'success', 'data' => $items], 200);
     }
 
     /**
@@ -267,7 +267,6 @@ class EmpleadosController extends Controller
             $tipo = $fechaEntrega = $fechaFormateada = '';
             $cantidad = 0;
 
-            // Factura
             if ( $item->tipo_historial_id == 1 ) { // Entrega
 
                 $tipo  = 'Entrega';

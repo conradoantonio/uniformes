@@ -6,7 +6,6 @@ use Excel;
 
 use \App\Recibo;
 use \App\Empleado;
-use \App\Factura;
 use \App\Historial;
 use \App\RazonSocial;
 use \App\StatusEmpleado;
@@ -152,7 +151,7 @@ class RazonesSocialesController extends Controller
                 $sheet->cell('A1', function($cell) use ($totalEntregadosGlobal) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
-                    $cell->setValue('Total de uniformes entregados por empleado: '.number_format( $totalEntregadosGlobal, 0));
+                    $cell->setValue('Total de uniformes entregados al empleado: '.number_format( $totalEntregadosGlobal, 0));
                 });
 
                 $sheet->cell('A2', function($cell) use ($totalRecibidosGlobal) {
@@ -185,17 +184,17 @@ class RazonesSocialesController extends Controller
     }
 
     /**
-     * Use Excel instance to export all bills with his balance at once.
+     * Use Excel instance to export all records according to parameters given by the user.
      *
      * @return \Illuminate\Http\Response
      */
-    public function exportBills(Request $req)
+    public function exportHistoric(Request $req)
     {
         $rows = array();
-        $req->request->add([ 'user' => auth()->user(), 'pagada' => 0, 'no_canceladas' => true ]);
-        $facturas = Factura::filter( $req->all() )->orderBy('fecha_facturacion', 'desc')->get();
+        $req->request->add([ 'user' => auth()->user() ]);
+        $items = Historial::filter( $req->all() )->orderBy('fecha_entrega', 'desc')->get();
 
-        $totalFacturas = $totalPagos = 0;
+        $totalEntregados = $totalRecibidos = 0;
         $fechaInicioFormateada = 'N/A';
         $fechaFinFormateada = 'N/A'; 
 
@@ -209,28 +208,33 @@ class RazonesSocialesController extends Controller
 
         $periodo = $fechaInicioFormateada.' - '.$fechaFinFormateada;
 
-        foreach ( $facturas as $factura ) {
+        foreach ( $items as $item ) {
             $fechaFormateada = 'N/A';
             $pagos = 0;
 
-            $pagos = Recibo::where('factura_id', $factura->id)->sum('importe');
-            $totalFacturas += $factura->importe;
-            $totalPagos += $pagos;
-            $fechaFormateada = $factura->fecha_facturacion ? strftime('%d', strtotime($factura->fecha_facturacion)).' de '.strftime('%B', strtotime($factura->fecha_facturacion)). ' del '.strftime('%Y', strtotime($factura->fecha_facturacion)) : '';
+            if ( $item->tipo->id == 1 ) { // Entregados
+                $totalEntregados += $item->cantidad;
+            } else if ( $item->tipo->id == 2 ) { // Recibidos
+                $totalRecibidos += $item->cantidad;
+            }
+
+            $fechaFormateada = $item->fecha_entrega ? strftime('%d', strtotime($item->fecha_entrega)).' de '.strftime('%B', strtotime($item->fecha_entrega)). ' del '.strftime('%Y', strtotime($item->fecha_entrega)) : '';
 
             $rows [] = [
-                'Empleado'             => $factura->cliente->nombre.' ('.$factura->cliente->razon_social->nombre.')',
-                'Número / Folio'       => $factura->numero_factura,
-                'Importe'              => $factura->importe,
-                'Pagos adjuntados'     => $pagos,
-                'Balance'              => $factura->importe - $pagos,
-                'Fecha de facturación' => $fechaFormateada,
-                'Comentario'           => $factura->comentarios_adicionales,
+                'Empleado'        => $item->empleado->nombre.' ('.$item->empleado->razon_social->nombre.')',
+                'Tipo'            => $item->tipo->descripcion,
+                'Artículo'        => $item->articulo->nombre,
+                'Status artículo' => $item->status->nombre,
+                'Talla'           => $item->talla->nombre,
+                'Color'           => $item->color,
+                'Cantidad'        => $item->cantidad,
+                'Fecha'           => $fechaFormateada,
+                'Notas'           => $item->notas,
             ];
         }
 
-        Excel::create('Listado de facturas', function($excel) use ($rows, $totalFacturas, $totalPagos, $periodo) {
-            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalFacturas, $totalPagos, $periodo) {
+        Excel::create('Listado de historial de uniformes', function($excel) use ($rows, $totalEntregados, $totalRecibidos, $periodo) {
+            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalEntregados, $totalRecibidos, $periodo) {
 
                 // $sheet->cell('A1', function($cell) use ($cliente) {
                 //     if ( $cliente ) {
@@ -246,25 +250,37 @@ class RazonesSocialesController extends Controller
                     $cell->setValue('Periodo: '.$periodo);
                 });
 
-                $sheet->cell('A2', function($cell) use ($totalFacturas, $totalPagos) {
+                $sheet->cell('A1', function($cell) use ($totalEntregados) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
-                    $cell->setValue('Balance: $'.number_format( $totalFacturas - $totalPagos, 2));
+                    $cell->setValue('Total de uniformes entregados al empleado: '.number_format( $totalEntregados, 0));
                 });
 
-                $sheet->cells('A:G', function($cells) {
+                $sheet->cell('A2', function($cell) use ($totalRecibidos) {
+                    $cell->setFontWeight('bold');
+                    $cell->setFontSize(12);
+                    $cell->setValue('Total de uniformes devueltos por empleado: '.number_format( $totalRecibidos, 0));
+                });
+
+                $sheet->cell('A3', function($cell) use ($totalEntregados, $totalRecibidos) {
+                    $cell->setFontWeight('bold');
+                    $cell->setFontSize(12);
+                    $cell->setValue('Artículos por devolver: '.number_format( $totalEntregados - $totalRecibidos, 0));
+                });
+
+                $sheet->cells('A:I', function($cells) {
                     $cells->setAlignment('left');
                     $cells->setValignment('center');
                 });
 
-                $sheet->cells('A5:G5', function($cells) {
+                $sheet->cells('A7:I7', function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('center');
                     $cells->setFontWeight('bold');
                     $cells->setFontSize(12);
                 });
 
-                $sheet->fromArray($rows, null, 'A5', true);
+                $sheet->fromArray($rows, null, 'A7', true);
                 // $sheet->setAutoFilter('A5:E5');
             });
         })->export('xlsx');

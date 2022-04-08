@@ -17,5 +17,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('clientes/excel/importar', 'ClientesController@import');
-Route::post('facturas/excel/importar', 'FacturasController@import');
+Route::post('empleados/excel/importar', 'EmpleadosController@import');
+Route::post('historico/excel/importar', 'HistoricosController@import');

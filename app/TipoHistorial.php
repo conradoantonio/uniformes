@@ -18,7 +18,7 @@ class TipoHistorial extends Model
      *
      * @var array
      */
-    protected $fillable = ['nombre', 'clase'];
+    protected $fillable = ['nombre', 'descripcion', 'clase'];
 
     /**
      * Get the bills related to the record

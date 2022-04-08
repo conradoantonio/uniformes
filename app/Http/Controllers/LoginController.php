@@ -34,12 +34,10 @@ class LoginController extends Controller
             } elseif( auth()->user()->role->descripcion == 'Visualización' ) {
                     
                 return redirect()->to('dashboard');
-                // return redirect()->to('facturas');
 
             } elseif( auth()->user()->role->descripcion == 'Escritura' ) {
                     
                 return redirect()->to('dashboard');
-                // return redirect()->to('facturas');
 
             } else {
 

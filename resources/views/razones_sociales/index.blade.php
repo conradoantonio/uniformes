@@ -88,13 +88,13 @@
 
     // Evento para click de generar excel por razón social
     $('body').delegate('.btn-generar-excel', 'click', function() {
-        url = baseUrl.concat('/razones-sociales/excel/export/bills');
+        url = baseUrl.concat('/razones-sociales/excel/export/historic');
 
-        razon_social_id   = $('div#modal-excel-historial input[name=razon_social_id]').val();
+        razon_social_id    = $('div#modal-excel-historial input[name=razon_social_id]').val();
         empleado_id        = $('div#modal-excel-historial select[name=empleado_id]').val();
         status_empleado_id = $('div#modal-excel-historial select[name=status_empleado_id]').val();
-        fecha_inicio      = $('div#modal-excel-historial input[name=fecha_inicio]').val();
-        fecha_fin         = $('div#modal-excel-historial input[name=fecha_fin]').val();
+        fecha_inicio       = $('div#modal-excel-historial input[name=fecha_inicio]').val();
+        fecha_fin          = $('div#modal-excel-historial input[name=fecha_fin]').val();
 
         url = url.concat('?razon_social_id='+razon_social_id);
         url = url.concat('&empleado_id='+empleado_id);
