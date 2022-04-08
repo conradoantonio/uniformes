@@ -108,6 +108,58 @@ function ajaxFormModal(form_id, config) {
     });
 }
 
+function ajaxFormCustom(formCustomData, config) {
+    $.ajax({
+        method: "POST",
+        url: config.route,
+        data: formCustomData,
+        cache:false,
+        contentType: false,
+        processData: false,
+        success: function(data) {
+            if (! config.keepModal ) { $('div.modal').modal('hide'); }
+            if ( swal.getState().isOpen ) { swal.close(); }
+            unBlockElement(config.element_class);
+            
+            if(! config.callback ) {
+                swal({
+                    title: data.status == 'success' ? 'Bien: ' : 'Error',
+                    icon: data.status ? data.status : "success",
+                    content: {
+                        element: "div",
+                        attributes: {
+                            innerHTML:"<p class='text-response'>"+data.msg ? data.msg : "¡Cambios guardados exitosamente!"+"</p>"
+                        },
+                    },
+                    buttons: false,
+                    closeOnEsc: false,
+                    closeOnClickOutside: false,
+                    timer: 2000
+                }).catch(swal.noop);
+            }
+
+            if (config.refresh == 'table') {
+                    refreshTable(data.url, config.column, config.table_class, config.container_class);
+            } else if (config.refresh == 'galery') {
+                    refreshGalery(data.url, config.container_class);
+            } else if (config.refresh == 'content') {
+                    refreshContent(data.url, config.container_class);
+            } else if(config.callback) {
+                window[config.callback](data, config);
+            } else if(config.redirect) {
+                setTimeout( function() {
+                    if (data.url) {
+                        window.location.href = data.url;
+                    }
+                }, '2000');
+            }
+        },
+        error: function(xhr, status, error) {
+            displayAjaxError(xhr, status, error, config);
+        }
+    });
+}
+
 function ajaxSimple(config) {
     $.ajax({
         method: config.method ? config.method : "POST",

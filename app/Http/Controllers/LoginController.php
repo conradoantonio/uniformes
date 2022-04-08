@@ -172,12 +172,12 @@ class LoginController extends Controller
 
         // Total de artículos entregados del periodo
         $data->totalArticulosEntregados = Historial::filter($filters)
-        ->where('tipo_recibo_id', 1)
+        ->where('tipo_historial_id', 1)
         ->sum('cantidad');
 
         // Total de artículos recibidos del periodo
         $data->totalArticulosRecibidos = Historial::filter($filters)
-        ->where('tipo_recibo_id', 2)
+        ->where('tipo_historial_id', 2)
         ->sum('cantidad');
 
 

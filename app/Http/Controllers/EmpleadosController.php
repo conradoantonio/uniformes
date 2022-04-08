@@ -245,7 +245,7 @@ class EmpleadosController extends Controller
         $req->request->add([ 'user' => auth()->user() ]);
 
         $rows = array();
-        $empleado = Empleado::find($req->cliente_id);
+        $empleado = Empleado::find($req->empleado_id);
 
         $items = Historial::filter( $req->all() )->get();
         $totalEntregados = $totalRecibidos = 0;
@@ -268,12 +268,12 @@ class EmpleadosController extends Controller
             $cantidad = 0;
 
             // Factura
-            if ( $item->tipo_recibo_id == 1 ) { // Entrega
+            if ( $item->tipo_historial_id == 1 ) { // Entrega
 
                 $tipo  = 'Entrega';
                 $totalEntregados += $item->cantidad;
 
-            } else if ( $item->tipo_recibo_id == 2 ) { // Recibido
+            } else if ( $item->tipo_historial_id == 2 ) { // Recibido
 
                 $tipo  = 'Recibido';
                 $totalRecibidos += $item->cantidad;
@@ -286,7 +286,7 @@ class EmpleadosController extends Controller
             $rows [] = [
                 'Empleado'          => $empleado->nombre,
                 'No. empleado'      => $empleado->numero_empleado,
-                'Artículo'          => $item->articulo,
+                'Artículo'          => $item->articulo->nombre,
                 'Status artículo'   => $item->status ? $item->status->nombre : 'N/A',
                 'Talla'             => $item->talla ? $item->talla->nombre : 'N/A',
                 'Color'             => $item->color ?? 'N/A',
@@ -319,7 +319,7 @@ class EmpleadosController extends Controller
                     $cell->setValue('Artículos entregados: #'.number_format( $totalEntregados, 0));
                 });
 
-                $sheet->cell('A3', function($cell) use ($totalRecibidos) {
+                $sheet->cell('A4', function($cell) use ($totalRecibidos) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
                     $cell->setValue('Artículos recibidos: #'.number_format( $totalRecibidos, 0));
@@ -337,7 +337,7 @@ class EmpleadosController extends Controller
                     $cells->setFontSize(12);
                 });
 
-                $sheet->fromArray($rows, null, 'A5', true);
+                $sheet->fromArray($rows, null, 'A6', true);
             });
         })->export('xlsx');
     }

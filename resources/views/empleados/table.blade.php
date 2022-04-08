@@ -28,8 +28,8 @@
                         <a class="btn btn-secondary btn-sm" href="{{url('empleados/asignar-uniformes/'.$item->id)}}" data-toggle="tooltip" data-placement="top" title="Registrar uniformes"><i class="mdi mdi-tag-multiple"></i></a>
                         {{-- <button class="btn btn-danger btn-sm delete-row" data-row-id="{{$item->id}}" data-toggle="tooltip" data-placement="top" title="Deshabilitar"><i class="mdi mdi-close-circle"></i></button> --}}
                     @endif
-                    <button class="btn btn-success btn-sm ver-historico" data-row-name="{{$item->nombre}}" data-row-id="{{$item->id}}" data-toggle="tooltip" data-placement="top" title="Ver historial de entrega de artículos"><i class="mdi mdi-more"></i></button>
-                    <button class="btn btn-info btn-sm generar-historico" data-row-name="{{$item->nombre}}" data-row-id="{{$item->id}}" data-toggle="tooltip" data-placement="top" title="Generar historial de entrega de artículos"><i class="mdi mdi-file-excel"></i></button>
+                    <button class="btn btn-info btn-sm ver-historico" data-row-name="{{$item->nombre}}" data-row-id="{{$item->id}}" data-toggle="tooltip" data-placement="top" title="Ver historial de entrega de artículos"><i class="mdi mdi-more"></i></button>
+                    <button class="btn btn-success btn-sm generar-historico" data-row-name="{{$item->nombre}}" data-row-id="{{$item->id}}" data-toggle="tooltip" data-placement="top" title="Generar historial de entrega de artículos"><i class="mdi mdi-file-excel"></i></button>
                     <button class="btn btn-warning btn-sm cambiar-status" data-row-name="{{$item->nombre}}" data-row-id="{{$item->id}}" data-toggle="tooltip" data-placement="top" title="Cambiar status"><i class="mdi mdi-format-list-checkbox"></i></button>
                 </td>
             </tr>

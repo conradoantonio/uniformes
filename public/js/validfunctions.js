@@ -219,21 +219,26 @@ $(function(){
         });
 
         if (inputs.length == 0) {
-            loadingMessage('Guardando...')
+            // Sólo para formulario que no usan ajax convencional
+            customFunction = form.data('custom-function');
+            if ( customFunction ) { window[customFunction](); }
+            else {
+                loadingMessage('Guardando...')
 
-            ajaxType = form.data('ajax-type');
-            config = {
-                'redirect'        : form.data('redirect'),
-                'refresh'         : form.data('refresh'),
-                'column'          : form.data('column'),
-                'table_class'     : form.data('table_class'),
-                'container_class' : form.data('container_class'),
-                'callback'        : form.data('callback'),
-                'keepModal'       : form.data('keep_modal'),
+                ajaxType = form.data('ajax-type');
+                config = {
+                    'redirect'        : form.data('redirect'),
+                    'refresh'         : form.data('refresh'),
+                    'column'          : form.data('column'),
+                    'table_class'     : form.data('table_class'),
+                    'container_class' : form.data('container_class'),
+                    'callback'        : form.data('callback'),
+                    'keepModal'       : form.data('keep_modal'),
+                }
+                if (ajaxType == 'ajax-form') { ajaxForm(form.attr('id'), config); }
+                else if (ajaxType == 'ajax-form-modal') { ajaxFormModal(form.attr('id'), config); }
+                else if (ajaxType == 'ajax-rate-users') { setRatingUsers(config, form.children('div').children('div').children('input[name=row_id]').val()); }//Especific function
             }
-            if (ajaxType == 'ajax-form') { ajaxForm(form.attr('id'), config); }
-            else if (ajaxType == 'ajax-form-modal') { ajaxFormModal(form.attr('id'), config); }
-            else if (ajaxType == 'ajax-rate-users') { setRatingUsers(config, form.children('div').children('div').children('input[name=row_id]').val()); }//Especific function
         } else {
             swal({
                 title: 'Verifique los siguientes campos: ',

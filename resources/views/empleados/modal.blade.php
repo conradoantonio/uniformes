@@ -19,7 +19,7 @@
 
                     <div class="form-group col-md-12">
                         <label>Tipo de registro</label>
-                        <select class="form-control" name="tipo_recibo_id" data-msg="Tipo de recibo">
+                        <select class="form-control" name="tipo_historial_id" data-msg="Tipo de recibo">
                             <option value="">Cualquiera</option>
                             <option value="1">Entrega</option>
                             <option value="2">Recibo</option>
@@ -27,13 +27,13 @@
                     </div>
                     
                     <div class="form-group col-md-12">
-                        <label class="required" for="date">Fecha inicio de movimientos</label>
-                        <input type="text" class="form-control not-empty date-picker" name="fecha_inicio" autocomplete="off" data-msg="Fecha del movimiento">
+                        <label class="required" for="date">Fecha inicio</label>
+                        <input type="text" class="form-control not-empty date-picker" name="fecha_inicio" autocomplete="off" data-msg="Fecha inicio">
                     </div>
 
                     <div class="form-group col-md-12">
-                        <label class="required" for="date">Fecha fin de movimientos</label>
-                        <input type="text" class="form-control not-empty date-picker" name="fecha_fin" autocomplete="off" data-msg="Fecha del movimiento">
+                        <label class="required" for="date">Fecha fin</label>
+                        <input type="text" class="form-control not-empty date-picker" name="fecha_fin" autocomplete="off" data-msg="Fecha fin">
                     </div>
                 </div>
             </div>

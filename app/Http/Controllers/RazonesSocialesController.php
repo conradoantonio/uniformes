@@ -7,6 +7,7 @@ use Excel;
 use \App\Recibo;
 use \App\Empleado;
 use \App\Factura;
+use \App\Historial;
 use \App\RazonSocial;
 use \App\StatusEmpleado;
 
@@ -114,56 +115,56 @@ class RazonesSocialesController extends Controller
      */
     public function export(Request $req)
     {
-        $rows = $clientes = array();
+        $rows = $empleados = array();
         $req->request->add([ 'user' => auth()->user() ]);
         $razones = RazonSocial::filter( $req->all() )->orderBy('id', 'desc')->get();
-        $totalFacturas = $totalPagos = 0;
+        $totalEntregadosGlobal = $totalRecibidosGlobal = 0;
 
         foreach ( $razones as $razon ) {
-            $montoFacturas = $pagosRealizados = 0;
+            $totalEntregados = $totalRecibidos = 0;
             
-            if( $req->status_cliente_id ) {
-                $clientes = $razon->clientes->where('status_cliente_id', $req->status_cliente_id);
+            if( $req->status_empleado_id ) {
+                $empleados = $razon->empleados->where('status_empleado_id', $req->status_empleado_id);
             } else {
-                $clientes = $razon->clientes;
+                $empleados = $razon->empleados;
             }
 
-            foreach( $clientes as $cliente ) {
-                $montoFacturas += $cliente->facturas->where('pagada', 0)->sum('importe');
-                $ids = Factura::where('cliente_id', $cliente->id)->where('pagada', 0)->pluck('id');
-                $pagosRealizados += Recibo::whereIn('factura_id', $ids)->sum('importe');
+            // Suma la cantidad de uniformes entregados y recibidos por razón social
+            foreach( $empleados as $empleado ) {
+                $totalEntregados += $empleado->uniformes_entregados->sum('cantidad');
+                $totalRecibidos  += $empleado->uniformes_recibidos->sum('cantidad');
             }
 
             $rows [] = [
-                'Razón social'     => $razon->nombre,
-                'Suma de facturas' => $montoFacturas,
-                'Suma de pagos'    => $pagosRealizados,
-                'Balance'          => $montoFacturas - $pagosRealizados,
+                'Razón social'           => $razon->nombre,
+                'Artículos entregados'   => $totalEntregados,
+                'Artículos devueltos'    => $totalRecibidos,
+                'Artículos por devolver' => $totalEntregados - $totalRecibidos,
             ];
 
-            $totalFacturas += $montoFacturas;
-            $totalPagos += $pagosRealizados;
+            $totalEntregadosGlobal += $totalEntregados;
+            $totalRecibidosGlobal  += $totalRecibidos;
         }
 
-        Excel::create('Adeudo por razón social', function($excel) use ($rows, $totalFacturas, $totalPagos) {
-            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalFacturas, $totalPagos) {
+        Excel::create('Histórico por razón social', function($excel) use ($rows, $totalEntregadosGlobal, $totalRecibidosGlobal) {
+            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalEntregadosGlobal, $totalRecibidosGlobal) {
 
-                $sheet->cell('A1', function($cell) use ($totalFacturas) {
+                $sheet->cell('A1', function($cell) use ($totalEntregadosGlobal) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
-                    $cell->setValue('Total de facturas: $'.number_format( $totalFacturas, 2));
+                    $cell->setValue('Total de uniformes entregados por empleado: '.number_format( $totalEntregadosGlobal, 0));
                 });
 
-                $sheet->cell('A2', function($cell) use ($totalPagos) {
+                $sheet->cell('A2', function($cell) use ($totalRecibidosGlobal) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
-                    $cell->setValue('Total de pagos: $'.number_format( $totalPagos, 2));
+                    $cell->setValue('Total de uniformes devueltos por empleado: '.number_format( $totalRecibidosGlobal, 0));
                 });
 
-                $sheet->cell('A3', function($cell) use ($totalFacturas, $totalPagos) {
+                $sheet->cell('A3', function($cell) use ($totalEntregadosGlobal, $totalRecibidosGlobal) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
-                    $cell->setValue('Balance: $'.number_format( $totalFacturas - $totalPagos, 2));
+                    $cell->setValue('Artículos por devolver: '.number_format( $totalEntregadosGlobal - $totalRecibidosGlobal, 0));
                 });
 
                 $sheet->cells('A:D', function($cells) {

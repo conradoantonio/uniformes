@@ -50,7 +50,7 @@ class Empleado extends Model
      */
     public function uniformes_entregados()
     {
-        return $this->hasMany('App\Historial')->where('tipo_recibo_id', 1);
+        return $this->hasMany('App\Historial')->where('tipo_historial_id', 1);
     }
 
     /**
@@ -59,7 +59,7 @@ class Empleado extends Model
      */
     public function uniformes_recibidos()
     {
-        return $this->hasMany('App\Historial')->where('tipo_recibo_id', 2);
+        return $this->hasMany('App\Historial')->where('tipo_historial_id', 2);
     }
 
     /**

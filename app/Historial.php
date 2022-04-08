@@ -47,7 +47,7 @@ class Historial extends Model
      */
     public function articulo()
     {
-        return $this->belongsTo('App\Empleado', 'articulo_id');
+        return $this->belongsTo('App\Articulo', 'articulo_id');
     }
 
     /**
@@ -78,8 +78,8 @@ class Historial extends Model
                 $query->whereIn('razon_social_id', $user->razones->pluck('id'));
             });
         })
-        ->when($filters['tipo_recibo_id'] ?? null, function($query, $tipo_recibo_id) {
-            $query->where('tipo_recibo_id', $tipo_recibo_id);
+        ->when($filters['tipo_historial_id'] ?? null, function($query, $tipo_historial_id) {
+            $query->where('tipo_historial_id', $tipo_historial_id);
         })
         ->when($filters['empleado_id'] ?? null, function($query, $empleado_id) {
             $query->where('empleado_id', $empleado_id);

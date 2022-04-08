@@ -34,6 +34,7 @@
                             @if( auth()->user()->permisos()->where('permisos.alias', 'razones_editar')->exists() )
                             <a href="{{url('razones-sociales/form')}}" class="btn btn-success"> <i class="mdi mdi-open-in-new"></i> Nuevo registro</a>
                             @endif
+                            <a href="javascript:;" class="btn btn-info export-global"> <i class="mdi mdi-file-excel"></i> Exportar historial global</a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -48,56 +49,56 @@
 </section>
 <script type="text/javascript">
     $(function() {
-        // $('#cliente_id').select2({
-        //     dropdownParent: $('#modal-excel-facturas-rs')
+        // $('#empleado_id').select2({
+        //     dropdownParent: $('#modal-excel-historial')
         // });
     });
 
     // Abre el modal para filtrar el adeudo de los empleados de cada razón social
-    $('body').delegate('.generar-excel-facturas', 'click', function() {
+    $('body').delegate('.generar-excel-historial', 'click', function() {
         id = $(this).data('row-id');
         nombre = $(this).data('row-name');
         url = $('div.general-info').data('url');
-        $('div#modal-excel-facturas-rs input[name=razon_social_id]').val(id);
-        $('div#modal-excel-facturas-rs input[name=razon_social_nombre]').val(nombre);
+        $('div#modal-excel-historial input[name=razon_social_id]').val(id);
+        $('div#modal-excel-historial input[name=razon_social_nombre]').val(nombre);
 
         var parent = '.div-empleados';
-        var select = 'select[name=cliente_id]';
+        var select = 'select[name=empleado_id]';
         config = {
             "razon_social_id"  : id,
             "only_data"        : true,
             "route"            : '{{url('empleados/filter')}}',
             "parent"           : parent,
             "select"           : select,
-            "dropdownParent"   : '#modal-excel-facturas-rs',
+            "dropdownParent"   : '#modal-excel-historial',
             "con_razon_social" : true,
             "select_2"         : true,
             "keepModal"        : true,
             "with_company"     : {{auth()->user()->role_id == 1 ? 1 : 0}} ,
-            "first_item"       : 'Clientes (Cualquiera)',
+            "first_item"       : 'Empleados (Cualquiera)',
             "callback"         : 'fillCustomerSelect',
         }
         ajaxSimple(config);
         blockElement(parent);
 
-        $('select[name=status_cliente_id]').val("");
+        $('select[name=status_empleado_id]').val("");
 
-        $('div#modal-excel-facturas-rs').modal();
+        $('div#modal-excel-historial').modal();
     });
 
     // Evento para click de generar excel por razón social
     $('body').delegate('.btn-generar-excel', 'click', function() {
         url = baseUrl.concat('/razones-sociales/excel/export/bills');
 
-        razon_social_id   = $('div#modal-excel-facturas-rs input[name=razon_social_id]').val();
-        cliente_id        = $('div#modal-excel-facturas-rs select[name=cliente_id]').val();
-        status_cliente_id = $('div#modal-excel-facturas-rs select[name=status_cliente_id]').val();
-        fecha_inicio      = $('div#modal-excel-facturas-rs input[name=fecha_inicio]').val();
-        fecha_fin         = $('div#modal-excel-facturas-rs input[name=fecha_fin]').val();
+        razon_social_id   = $('div#modal-excel-historial input[name=razon_social_id]').val();
+        empleado_id        = $('div#modal-excel-historial select[name=empleado_id]').val();
+        status_empleado_id = $('div#modal-excel-historial select[name=status_empleado_id]').val();
+        fecha_inicio      = $('div#modal-excel-historial input[name=fecha_inicio]').val();
+        fecha_fin         = $('div#modal-excel-historial input[name=fecha_fin]').val();
 
         url = url.concat('?razon_social_id='+razon_social_id);
-        url = url.concat('&cliente_id='+cliente_id);
-        url = url.concat('&status_cliente_id='+status_cliente_id);
+        url = url.concat('&empleado_id='+empleado_id);
+        url = url.concat('&status_empleado_id='+status_empleado_id);
         url = url.concat('&fecha_inicio='+fecha_inicio);
         url = url.concat('&fecha_fin='+fecha_fin);
         // console.log(url);
@@ -105,21 +106,21 @@
     });
 
     // Abre el modal para filtrar el adeudo global de cada razón social
-    $('body').delegate('.export-global-bill', 'click', function() {
-        $('select[name=status_cliente_id]').val("");
+    $('body').delegate('.export-global', 'click', function() {
+        $('select[name=status_empleado_id]').val("");
 
-        $('div#modal-global-excel-facturas').modal();
+        $('div#modal-global-excel').modal();
     });
 
     // Evento click para generar el adeudo global de cada razón social
-    $('body').delegate('.btn-generar-excel-global-facturas', 'click', function() {
+    $('body').delegate('.btn-generar-excel-global', 'click', function() {
         url = baseUrl.concat('/razones-sociales/excel/export');
 
-        status_cliente_id = $('div#modal-global-excel-facturas select[name=status_cliente_id]').val();
-        // fecha_inicio      = $('div#modal-global-excel-facturas input[name=fecha_inicio]').val();
-        // fecha_fin         = $('div#modal-global-excel-facturas input[name=fecha_fin]').val();
+        status_empleado_id = $('div#modal-global-excel select[name=status_empleado_id]').val();
+        // fecha_inicio      = $('div#modal-global-excel input[name=fecha_inicio]').val();
+        // fecha_fin         = $('div#modal-global-excel input[name=fecha_fin]').val();
 
-        url = url.concat('?status_cliente_id='+status_cliente_id);
+        url = url.concat('?status_empleado_id='+status_empleado_id);
         // url = url.concat('&fecha_inicio='+fecha_inicio);
         // url = url.concat('&fecha_fin='+fecha_fin);
 
@@ -127,16 +128,16 @@
     });
 
     //Recargará los empleados dependiendo de su status y razón social
-    $('select[name=razon_social_id], select[name=status_cliente_id]').change(function() {
+    $('select[name=razon_social_id], select[name=status_empleado_id]').change(function() {
         console.log('hola');
         var razon_social_id = $('input[name=razon_social_id]').val();
-        var status_cliente_id = $('select[name=status_cliente_id]').val();
+        var status_empleado_id = $('select[name=status_empleado_id]').val();
         var parent = '.div-empleados';
-        var select = 'select[name=cliente_id]';
+        var select = 'select[name=empleado_id]';
         if ( razon_social_id ) {
             config = {
                 "razon_social_id"   : razon_social_id,
-                "status_cliente_id" : status_cliente_id,
+                "status_empleado_id" : status_empleado_id,
                 "only_data"         : true,
                 "route"             : '{{url('empleados/filter')}}',
                 "parent"            : parent,
@@ -145,14 +146,14 @@
                 "con_razon_social"  : true,
                 "select_2"          : true,
                 "with_company"      : {{auth()->user()->role_id == 1 ? 1 : 0}} ,
-                "first_item"        : 'Clientes (Cualquiera)',
+                "first_item"        : 'Empleados (Cualquiera)',
                 "callback"          : 'fillCustomerSelect',
             }
             ajaxSimple(config);
             blockElement(parent);
         } else {
             $( select ).children('option').remove();
-            $( select ).append('<option value="">Clientes (Cualquiera)</option>');
+            $( select ).append('<option value="">Empleados (Cualquiera)</option>');
             $( select ).select2('destroy');
             $( select ).select2();
         }

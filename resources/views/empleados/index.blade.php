@@ -171,10 +171,10 @@
         empleado_id  = $('div#modal-historico input[name=empleado_id]').val();
         fecha_inicio = $('div#modal-historico input[name=fecha_inicio]').val();
         fecha_fin    = $('div#modal-historico input[name=fecha_fin]').val();
-        tipo_id      = $('div#modal-historico input[name=tipo_recibo_id]').val();
+        tipo_id      = $('div#modal-historico select[name=tipo_historial_id]').val();
 
         url = url.concat('?empleado_id='+empleado_id);
-        url = url.concat('&tipo_recibo_id='+tipo_id);
+        url = url.concat('&tipo_historial_id='+tipo_id);
         url = url.concat('&fecha_inicio='+fecha_inicio);
         url = url.concat('&fecha_fin='+fecha_fin);
         // console.log(url);
