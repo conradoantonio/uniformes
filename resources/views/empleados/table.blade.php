@@ -26,6 +26,7 @@
                     @if( auth()->user()->permisos()->where('permisos.alias', 'empleados_editar')->exists() )
                         <a class="btn btn-dark btn-sm" href="{{url('empleados/form/'.$item->id)}}" data-toggle="tooltip" data-placement="top" title="Editar"><i class="mdi mdi-square-edit-outline"></i></a>
                         <a class="btn btn-secondary btn-sm" href="{{url('empleados/asignar-uniformes/'.$item->id)}}" data-toggle="tooltip" data-placement="top" title="Registrar uniformes"><i class="mdi mdi-tag-multiple"></i></a>
+                        <button class="btn btn-danger btn-sm delete-row" data-row-id="{{$item->id}}" data-toggle="tooltip" data-placement="top" title="Eliminar"><i class="mdi mdi-trash-can"></i></button>
                         {{-- <button class="btn btn-danger btn-sm delete-row" data-row-id="{{$item->id}}" data-toggle="tooltip" data-placement="top" title="Deshabilitar"><i class="mdi mdi-close-circle"></i></button> --}}
                     @endif
                     <button class="btn btn-info btn-sm ver-historico" data-row-name="{{$item->nombre}}" data-row-id="{{$item->id}}" data-toggle="tooltip" data-placement="top" title="Ver historial de entrega de artículos"><i class="mdi mdi-more"></i></button>

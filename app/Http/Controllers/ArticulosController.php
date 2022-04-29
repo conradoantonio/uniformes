@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use \App\Articulo;
+use \App\StatusArticulo;
 
 use Illuminate\Http\Request;
 
@@ -34,11 +35,12 @@ class ArticulosController extends Controller
         $title = "Formulario de artículo";
         $menu = "Artículos";
         $item = null;
+        $status = StatusArticulo::all();
         
         if ( $id ) {
             $item = Articulo::where('id', $id)->first();
         }
-        return view('articulos.form', compact(['item', 'menu', 'title']));
+        return view('articulos.form', compact(['item', 'menu', 'status', 'title']));
     }
 
     /**
@@ -48,9 +50,16 @@ class ArticulosController extends Controller
      */
     public function save(Request $req)
     {
+        $status = StatusArticulo::find( $req->status_articulo_id );
+
+        if (! $status ) { return response(['msg' => 'Seleccione un status válido', 'status' => 'error'], 404); }
+
         $item = New Articulo;
 
         $item->nombre = $req->nombre;
+        $item->talla = $req->talla;
+        $item->color = $req->color;
+        $item->status_articulo_id = $status->id;
         $item->descripcion = $req->descripcion;
 
         $item->save();
@@ -65,11 +74,18 @@ class ArticulosController extends Controller
      */
     public function update(Request $req)
     {
+        $status = StatusArticulo::find( $req->status_articulo_id );
+
+        if (! $status ) { return response(['msg' => 'Seleccione un status válido', 'status' => 'error'], 404); }
+        
         $item = Articulo::find($req->id);
 
         if (! $item ) { return response(['msg' => 'No se encontró el registro a editar', 'status' => 'error'], 404); }
 
         $item->nombre = $req->nombre;
+        $item->talla = $req->talla;
+        $item->color = $req->color;
+        $item->status_articulo_id = $status->id;
         $item->descripcion = $req->descripcion;
 
         $item->save();

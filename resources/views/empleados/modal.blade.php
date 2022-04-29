@@ -21,8 +21,9 @@
                         <label>Tipo de registro</label>
                         <select class="form-control" name="tipo_historial_id" data-msg="Tipo de recibo">
                             <option value="">Cualquiera</option>
-                            <option value="1">Entrega</option>
-                            <option value="2">Recibo</option>
+                            <option value="1">En ruta</option>
+                            <option value="2">Entregado</option>
+                            <option value="3">Devuelto</option>
                         </select>
                     </div>
                     
@@ -44,6 +45,51 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="label-title" id="modal-add-historic-move">
+    <div class="modal-dialog" role="document">
+        <form id="form-add-historic-move" action="{{url('historicos/types/save')}}" onsubmit="return false;" enctype="multipart/form-data" method="POST" autocomplete="off" data-ajax-type="ajax-form" data-custom-function="guardarMovimiento" data-keep_modal="true">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="label-title">Agregar/Editar tipo de movimiento del artículo</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12 d-none">
+                            <label>ID historial</label>
+                            <input type="text" class="form-control" name="historial_id" data-msg="ID de historial">
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <label>Artículo</label>
+                            <input type="text" class="form-control" disabled name="articulo_nombre" data-msg="Nombre de artículo">
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <label>Fecha de movimiento</label>
+                            <input type="text" class="form-control not-empty date-picker" name="fecha_movimiento" data-msg="Fecha de movimiento">
+                        </div>
+                        
+                        <div class="form-group col-md-12">
+                            <label class="required" for="date">Movimiento</label>
+                            <select class="form-control not-empty" name="tipo_historial_id" data-msg="Movimiento">
+                                <option value="" selected>Selecciona una opción</option>
+                                <option value="1">En ruta</option>
+                                <option value="2">Entregado</option>
+                                <option value="3">Devuelto</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-success save" data-target-id="form-add-historic-move">Cambiar status</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="label-title" id="modal-change-status">
     <div class="modal-dialog" role="document">
@@ -101,14 +147,17 @@
                                 <div class="table-responsive">
                                     <table class="table table-hover table-sm historico text-center">
                                         <thead>
-                                            <th class="align-middle">Tipo</th>
+                                            {{-- <th class="align-middle">Tipo</th> --}}
                                             <th class="align-middle">Artículo</th>
                                             <th class="align-middle">Status</th>
                                             <th class="align-middle">Talla</th>
                                             <th class="align-middle">Color</th>
                                             <th class="align-middle">Cantidad</th>
-                                            <th class="align-middle">Fecha entrega</th>
+                                            <th class="align-middle">Servicio guardia</th>
+                                            <th class="align-middle">Supervisor</th>
+                                            {{-- <th class="align-middle">Fecha entrega</th> --}}
                                             <th class="align-middle">Notas</th>
+                                            <th class="align-middle">Movimientos</th>
                                             <th class="align-middle">Acciones</th>
                                         </thead>
                                         <tbody>

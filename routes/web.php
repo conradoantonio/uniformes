@@ -91,6 +91,7 @@ Route::middleware(['auth'])->group(function () {
     #Registro de histórico de artículos
     Route::middleware(['permission:empleados_editar'])->prefix('historicos')->group(function () {
         Route::get('/', 'HistoricosController@index');
+        Route::post('types/save', 'HistoricosController@saveMove');// Guarda el histórico de los tipos de movimiento
         Route::post('save', 'HistoricosController@save');
         Route::post('delete', 'HistoricosController@delete');
     });

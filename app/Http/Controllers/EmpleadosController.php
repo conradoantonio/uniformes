@@ -9,6 +9,7 @@ use \App\Empleado;
 use \App\Articulo;
 use \App\Historial;
 use \App\RazonSocial;
+use \App\HistorialTipo;
 use \App\StatusArticulo;
 use \App\StatusEmpleado;
 
@@ -114,13 +115,15 @@ class EmpleadosController extends Controller
      */
     public function verHistorico(Request $req)
     {
-        $items = Historial::with(['tipo', 'articulo', 'status', 'talla'])
+        $items = Historial::with(['tipos', 'articulo'])
         ->filter( $req->all() )
         ->get();
         // ->where('id', $req->empleado_id)
 
         foreach ($items as $item) {
-            $item->fechaFormateada = strftime('%d', strtotime($item->fecha_entrega)).' de '.strftime('%B', strtotime($item->fecha_entrega)). ' del '.strftime('%Y', strtotime($item->fecha_entrega));
+            foreach($item->tipos as $tipo) {
+                $tipo->fechaFormateada = strftime('%d', strtotime($tipo->pivot->fecha)).' de '.strftime('%B', strtotime($tipo->pivot->fecha)). ' del '.strftime('%Y', strtotime($tipo->pivot->fecha));
+            }
         }
 
         return response(['msg' => 'Información de historial enlistada a continuación', 'status' => 'success', 'data' => $items], 200);
@@ -141,8 +144,8 @@ class EmpleadosController extends Controller
 
         $item->nombre = $req->nombre;
         $item->razon_social_id = $razonSocial->id;
+        $item->status_empleado_id = 1;
         $item->numero_empleado = $req->numero_empleado;
-        $item->ine = $req->ine;
         $item->fecha_ingreso = $req->fecha_ingreso;
         $item->fecha_baja = $req->fecha_baja;
         $item->observaciones = $req->observaciones;
@@ -170,7 +173,6 @@ class EmpleadosController extends Controller
         $item->nombre = $req->nombre;
         $item->razon_social_id = $razonSocial->id;
         $item->numero_empleado = $req->numero_empleado;
-        $item->ine = $req->ine;
         $item->fecha_ingreso = $req->fecha_ingreso;
         $item->fecha_baja = $req->fecha_baja;
         $item->observaciones = $req->observaciones;
@@ -246,11 +248,13 @@ class EmpleadosController extends Controller
 
         $rows = array();
         $empleado = Empleado::find($req->empleado_id);
-
+        // dd($req->all());
         $items = Historial::filter( $req->all() )->get();
+        // dd($items);
         $totalEntregados = $totalRecibidos = 0;
         $fechaInicioFormateada = 'N/A';
         $fechaFinFormateada = 'N/A'; 
+        $movimientos = '';
 
         if ( $req->fecha_inicio ) {
             $fechaInicioFormateada = strftime('%d', strtotime($req->fecha_inicio)).' de '.strftime('%B', strtotime($req->fecha_inicio)). ' del '.strftime('%Y', strtotime($req->fecha_inicio));
@@ -264,33 +268,32 @@ class EmpleadosController extends Controller
 
         foreach ( $items as $item ) {
 
-            $tipo = $fechaEntrega = $fechaFormateada = '';
-            $cantidad = 0;
+            $fechaEntrega = $fechaFormateada = '';
 
-            if ( $item->tipo_historial_id == 1 ) { // Entrega
+            $entregados = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [1,2])->count();
+            $recibidos  = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [3])->count();
 
-                $tipo  = 'Entrega';
-                $totalEntregados += $item->cantidad;
+            if ( $entregados > 0 ) { $totalEntregados += $item->cantidad; }
+            if ( $recibidos > 0 ) { $totalRecibidos += $item->cantidad; }
 
-            } else if ( $item->tipo_historial_id == 2 ) { // Recibido
-
-                $tipo  = 'Recibido';
-                $totalRecibidos += $item->cantidad;
-
+            foreach( $item->tipos as $move ) {
+                $fechaEntrega = $move->pivot->fecha;
+                $fechaFormateada = strftime('%d', strtotime($fechaEntrega)).' de '.strftime('%B', strtotime($fechaEntrega)). ' del '.strftime('%Y', strtotime($fechaEntrega));
+                $movimientos .= ( $move->nombre.' - '.$fechaFormateada.' / ' );
             }
             
-            $fechaEntrega = $item->fecha_entrega;
-            $fechaFormateada = strftime('%d', strtotime($fechaEntrega)).' de '.strftime('%B', strtotime($fechaEntrega)). ' del '.strftime('%Y', strtotime($fechaEntrega));
 
             $rows [] = [
                 'Empleado'          => $empleado->nombre,
                 'No. empleado'      => $empleado->numero_empleado,
                 'Artículo'          => $item->articulo->nombre,
-                'Status artículo'   => $item->status ? $item->status->nombre : 'N/A',
-                'Talla'             => $item->talla ? $item->talla->nombre : 'N/A',
+                'Status artículo'   => $item->status ? $item->status : 'N/A',
+                'Talla'             => $item->talla ? $item->talla : 'N/A',
                 'Color'             => $item->color ?? 'N/A',
                 'Cantidad'          => $item->cantidad ?? 'N/A',
-                'Fecha de entrega'  => $fechaEntrega ?? 'N/A',
+                'Movimientos'       => $movimientos ?? 'N/A',
+                'Servicio guardia'  => $item->servicio_guardia ?? 'N/A',
+                'Supervisor'        => $item->supervisor ?? 'N/A',
                 'Notas adicionales' => $item->notas,
             ];
         }
@@ -324,12 +327,12 @@ class EmpleadosController extends Controller
                     $cell->setValue('Artículos recibidos: #'.number_format( $totalRecibidos, 0));
                 });
 
-                $sheet->cells('A:I', function($cells) {
+                $sheet->cells('A:K', function($cells) {
                     $cells->setAlignment('left');
                     $cells->setValignment('center');
                 });
 
-                $sheet->cells('A5:I5', function($cells) {
+                $sheet->cells('A6:K6', function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('center');
                     $cells->setFontWeight('bold');

@@ -33,9 +33,32 @@
                                     <label>ID</label>
                                     <input type="text" class="form-control" name="id" value="{{$item ? $item->id : ''}}">
                                 </div>
-                                <div class="form-group col-md-12">
+                                <div class="form-group col-md-6">
                                     <label>Artículo*</label>
                                     <input type="text" class="form-control not-empty" value="{{$item ? $item->nombre : ''}}" name="nombre" data-msg="Artículo">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Talla</label>
+                                    <input type="text" class="form-control" value="{{$item ? $item->talla : ''}}" name="talla" data-msg="Talla">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Color*</label>
+                                    <input type="text" class="form-control not-empty" value="{{$item ? $item->color : ''}}" name="color" data-msg="Color">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="control-label" for="type">Status del artículo*</label>
+                                    <select id="status_articulo_id" name="status_articulo_id" class="form-control not-empty" data-msg="Status">
+                                        <option value="" selected>Seleccione una opción</option>
+                                        @if ( $item )
+                                            @foreach($status as $st)
+                                                <option value="{{$st->id}}" {{$item->status_articulo_id == $st->id ? 'selected' : ''}}>{{$st->nombre}}</option>
+                                            @endforeach
+                                        @else
+                                            @foreach($status as $st)
+                                                <option value="{{$st->id}}">{{$st->nombre}}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
                                 </div>
                                 <div class="form-group col-md-12">
                                     <label>Descripción</label>

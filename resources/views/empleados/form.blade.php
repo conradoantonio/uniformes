@@ -8,7 +8,7 @@
                 <div class="col-md-6 m-auto text-white p-t-40 p-b-90">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb m-b-0 bg-transparent ol-breadcrum">
-                            <li class="breadcrumb-item"><a href="javascript:;">Clientes</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:;">Empleados</a></li>
                         </ol>
                     </nav>
                 </div>
@@ -28,7 +28,7 @@
             <div class="col-lg-12 m-b-30">
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="">Ingresa los datos del cliente</h2>
+                        <h2 class="">Ingresa los datos del empleado</h2>
                     </div>
                     <div class="card-body">
                         <form id="form-data" action="{{url('empleados/'.($item ? 'update' : 'save'))}}" onsubmit="return false;" enctype="multipart/form-data" method="POST" autocomplete="off" data-ajax-type="ajax-form" data-column="0" data-refresh="" data-redirect="1" data-table_id="example3" data-container_id="table-container">
@@ -55,17 +55,13 @@
                                         @endif
                                     </select>
                                 </div>
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-12">
                                     <label>Nombre completo*</label>
                                     <input type="text" class="form-control not-empty" name="nombre" value="{{$item ? $item->nombre : ''}}" data-msg="Nombre completo">
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label>Número de empleado*</label>
-                                    <input type="text" class="form-control not-empty" name="numero_empleado" value="{{$item ? $item->numero_empleado : ''}}" data-msg="Número empleado">
-                                </div>
                                 <div class="form-group col-md-4">
-                                    <label>INE*</label>
-                                    <input type="text" class="form-control not-empty" name="ine" value="{{$item ? $item->ine : ''}}" data-msg="INE">
+                                    <label>Número de empleado</label>
+                                    <input type="text" class="form-control" name="numero_empleado" value="{{$item ? $item->numero_empleado : ''}}" data-msg="Número empleado">
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label>Fecha ingreso</label>

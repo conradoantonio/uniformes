@@ -19,8 +19,9 @@ class Historial extends Model
      * @var array
      */
     protected $fillable = [
-        'tipo_historial_id', 'empleado_id', 'articulo_id', 'status_articulo_id', 
-        'talla_id', 'color', 'cantidad', 'fecha_entrega', 'notas'
+        'tipo_historial_id', 'empleado_id', 'articulo_id', 'color', 'talla', 
+        'cantidad', 'status', 'fecha_entrega', 'notas', 'servicio_guardia', 
+        'supervisor'
     ];
 
     /**
@@ -38,7 +39,7 @@ class Historial extends Model
      */
     public function empleado()
     {
-        return $this->belongsTo('App\Empleado', 'empleado_id')->withTrashed();
+        return $this->belongsTo('App\Empleado', 'empleado_id');
     }
 
     /**
@@ -51,21 +52,12 @@ class Historial extends Model
     }
 
     /**
-     * Get the status related to the record
+     * Get the types related to the record
      *
      */
-    public function status()
+    public function tipos()
     {
-        return $this->belongsTo('App\StatusArticulo', 'status_articulo_id');
-    }
-
-    /**
-     * Get the size related to the record
-     *
-     */
-    public function talla()
-    {
-        return $this->belongsTo('App\Talla', 'talla_id');
+        return $this->belongsToMany(TipoHistorial::class, 'historial_tipo', 'historial_id', 'tipo_historial_id')->withPivot('fecha');
     }
 
     /**
@@ -89,7 +81,9 @@ class Historial extends Model
             });
         })
         ->when($filters['tipo_historial_id'] ?? null, function($query, $tipo_historial_id) {
-            $query->where('tipo_historial_id', $tipo_historial_id);
+            $query->whereHas('tipos', function($query) use($tipo_historial_id) {
+                $query->where('tipo_historial_id', $tipo_historial_id);
+            });
         })
         ->when($filters['empleado_id'] ?? null, function($query, $empleado_id) {
             $query->where('empleado_id', $empleado_id);
@@ -103,11 +97,15 @@ class Historial extends Model
         ->when($filters['talla_id'] ?? null, function($query, $talla_id) {
             $query->where('talla_id', $talla_id);
         })
-        ->when($filters['fecha_inicio'] ?? null, function($query, $fecha_inicio) {
-            $query->where('fecha_entrega', '>=', $fecha_inicio.' 00:00:00');
+        ->when($filters['fecha_inicio'] ?? null, function($query, $fecha) {
+            $query->whereHas('tipos', function($query) use($fecha) {
+                $query->where('fecha', '>=', $fecha.' 00:00:00');
+            });
         })
-        ->when($filters['fecha_fin'] ?? null, function($query, $fecha_fin) {
-            $query->where('fecha_entrega', '<=', $fecha_fin.' 23:59:59');
+        ->when($filters['fecha_fin'] ?? null, function($query, $fecha) {
+            $query->whereHas('tipos', function($query) use($fecha) {
+                $query->where('fecha', '<=', $fecha.' 00:00:00');
+            });
         })
         ->when($filters['limit'] ?? null, function($query, $limit) {
             $query->limit($limit);

@@ -21,8 +21,17 @@ class Articulo extends Model
      *
      * @var array
      */
-    protected $fillable = ['nombre', 'descripcion'];
+    protected $fillable = ['nombre', 'talla', 'color', 'status_articulo_id', 'descripcion'];
 
+    /**
+     * Get the status related to the record
+     *
+     */
+    public function status()
+    {
+        return $this->belongsTo('App\StatusArticulo', 'status_articulo_id');
+    }
+    
     /**
      * Get the bill related to the record
      *

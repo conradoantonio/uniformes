@@ -37,4 +37,13 @@ class TipoHistorial extends Model
     {
         return $this->hasMany('App\Historial')->where('tipo_recibo_id', 2);
     }
+
+    /**
+     * Get the types related to the record
+     *
+     */
+    public function historiales()
+    {
+        return $this->belongsToMany(Historial::class, 'historial_tipo', 'tipo_historial_id', 'historial_id');
+    }
 }

@@ -8,7 +8,7 @@
                 <div class="col-md-6 m-auto text-white p-t-40 p-b-90">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb m-b-0 bg-transparent ol-breadcrum">
-                            <li class="breadcrumb-item"><a href="javascript:;">Clientes</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:;">Empleados</a></li>
                         </ol>
                     </nav>
                 </div>
@@ -47,9 +47,9 @@
                                 <div class="form-group col-md-6">
                                     <label class="control-label" for="type">Tipo de registro*</label>
                                     <select id="tipo_historial_id" name="tipo_historial_id" class="form-control not-empty" data-msg="Tipo de registro">
-                                        <option value="" selected>Seleccione una opción</option>
-                                        <option value="1">Entrega</option>
-                                        <option value="2">Recibo</option>
+                                        <option value="1">En ruta</option>
+                                        <option value="2">Entregado</option>
+                                        <option value="3">Devuelto</option>
                                        
                                     </select>
                                 </div>
@@ -58,43 +58,37 @@
                                     <select id="articulo_id" name="articulo_id" class="form-control not-empty" data-msg="Artículo">
                                         <option value="" selected>Seleccione una opción</option>
                                         @foreach($articulos as $articulo)
-                                            <option value="{{$articulo->id}}">{{$articulo->nombre}}</option>
+                                            <option value="{{$articulo->id}}" data-obj="{{$articulo}}" >{{$articulo->nombre}}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label class="control-label" for="type">Talla*</label>
-                                    <select id="talla_id" name="talla_id" class="form-control not-empty" data-msg="Talla">
-                                        <option value="" selected>Seleccione una opción</option>
-                                        @foreach($tallas as $talla)
-                                            <option value="{{$talla->id}}">{{$talla->nombre}}</option>
-                                        @endforeach
-                                    </select>
+                                    <label class="control-label" for="type">Talla</label>
+                                    <input type="text" class="form-control" name="talla" value="" data-msg="Talla">
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label class="control-label" for="type">Status del artículo*</label>
-                                    <select id="status_articulo_id" name="status_articulo_id" class="form-control not-empty" data-msg="Status">
-                                        <option value="" selected>Seleccione una opción</option>
-                                        @foreach($status as $st)
-                                            <option value="{{$st->id}}">{{$st->nombre}}</option>
-                                        @endforeach
-                                    </select>
+                                    <label>Color</label>
+                                    <input type="text" class="form-control" name="color" value="" data-msg="Color">
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label>Color*</label>
-                                    <input type="text" class="form-control not-empty" name="color" value="" data-msg="Color">
-                                </div>
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-6">
                                     <label>Cantidad*</label>
                                     <input type="text" class="form-control not-empty" name="cantidad" value="" data-msg="Cantidad">
                                 </div>
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-6">
                                     <label>Fecha entrega</label>
-                                    <input type="text" class="form-control date-picker" name="fecha_entrega" value="">
+                                    <input type="text" class="form-control not-empty date-picker" name="fecha_entrega" value="" data-msg="Fecha de entrega">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Supervisor</label>
+                                    <input type="text" class="form-control" name="supervisor" value="" data-msg="Supervisor">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Servicio del guardia</label>
+                                    <input type="text" class="form-control" name="servicio_guardia" value="" data-msg="Servicio del guardia">
                                 </div>
                                 <div class="form-group col-md-12">
                                     <label>Notas</label>
-                                    <textarea name="notas" class="form-control" rows="3"></textarea>
+                                    <textarea name="notas" class="form-control" rows="3" data-msg="Notas"></textarea>
                                 </div>
                                 
                             </div>
@@ -104,7 +98,6 @@
                                     <button type="button" class="btn btn-info save agregar-historial">Agregar registro</button>
                                 </div>
                             </div>
-
 
                             <div class="form-group m-t-15">
                                 <div class="table-responsive">
@@ -145,6 +138,18 @@
     </div>
 </section>
 <script type="text/javascript">
+    // Al seleccionar un artículo, se llenarán los campos talla y color
+    $('#articulo_id').on('change', function() {
+        let obj = $(this).children(':selected').data('obj');
+        
+        $('[name="talla"], [name="color"]').val('');
+
+        if ( obj ) {
+            $('[name="talla"]').val(obj.talla);
+            $('[name="color"]').val(obj.color);
+        }
+    });
+
     // Valida el agregar un registro de uniformes a la tabla
     function agregarRegistro() { 
         let timerId = Date.now();
@@ -155,13 +160,12 @@
             tipo_historial_id  : $('select[name="tipo_historial_id"]').val(),
             articulo           : $('select[name="articulo_id"]').children(':selected').text(),
             articulo_id        : $('select[name="articulo_id"]').val(),
-            status_articulo    : $('select[name="status_articulo_id"]').children(':selected').text(),
-            status_articulo_id : $('select[name="status_articulo_id"]').val(),
-            talla              : $('select[name="talla_id"]').children(':selected').text(),
-            talla_id           : $('select[name="talla_id"]').val(),
+            talla              : $('input[name="talla"]').val(),
             color              : $('input[name="color"]').val(),
             cantidad           : $('input[name="cantidad"]').val(),
             fecha_entrega      : $('input[name="fecha_entrega"]').val(),
+            supervisor         : $('input[name="supervisor"]').val(),
+            servicio_guardia   : $('input[name="servicio_guardia"]').val(),
             notas              : $('textarea[name="notas"]').val() 
         }
 
@@ -187,11 +191,13 @@
                 '<tr data-row-id='+timerId+' class="row-item" data-row=' + "'" + JSON.stringify(registro) + "'" + '>' +
                     '<td>'+ ( registro.tipo_historial ) +'</td>'+
                     '<td>'+ ( registro.articulo ) +'</td>'+
-                    '<td>'+ ( registro.status_articulo ) +'</td>'+
+                    // '<td>'+ ( registro.status_articulo ) +'</td>'+
                     '<td>'+ ( registro.talla ) +'</td>'+
                     '<td>'+ ( registro.color ) +'</td>'+
                     '<td>'+ ( registro.cantidad ) +'</td>'+
                     '<td>'+ ( registro.fecha_entrega ) +'</td>'+
+                    '<td>'+ ( registro.supervisor ) +'</td>'+
+                    '<td>'+ ( registro.servicio_guardia ) +'</td>'+
                     '<td>'+ ( registro.notas ) +'</td>'+
                     '<td class="text-center">'+
                         '<button class="btn btn-sm btn-danger delete-row-historial" data-table-ref=".historico" data-row-id='+timerId+'> <i class="mdi mdi-trash-can"></i> </button>'+

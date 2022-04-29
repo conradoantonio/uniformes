@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Empleado extends Model
 {
-    use SoftDeletes;
+    // use SoftDeletes;
     
     /**
      * The table associated with the model.
@@ -23,7 +23,7 @@ class Empleado extends Model
      */
     protected $fillable = [
         'razon_social_id', 'status_empleado_id', 'nombre', 'numero_empleado', 
-        'ine', 'domicilio', 'fecha_ingreso', 'fecha_baja', 'observaciones'
+        'domicilio', 'fecha_ingreso', 'fecha_baja', 'observaciones'
     ];
 
     /**
