@@ -99,7 +99,7 @@ class EmpleadosController extends Controller
         ];
         
         $tallas = Talla::all();
-        $articulos = Articulo::all();
+        $articulos = Articulo::orderBy('nombre', 'asc')->get();
         $status = StatusArticulo::all();
 
         if ( $id ) {
@@ -251,10 +251,9 @@ class EmpleadosController extends Controller
         // dd($req->all());
         $items = Historial::filter( $req->all() )->get();
         // dd($items);
-        $totalEntregados = $totalRecibidos = 0;
+        $totalEntregados = $totalDevueltos = 0;
         $fechaInicioFormateada = 'N/A';
         $fechaFinFormateada = 'N/A'; 
-        $movimientos = '';
 
         if ( $req->fecha_inicio ) {
             $fechaInicioFormateada = strftime('%d', strtotime($req->fecha_inicio)).' de '.strftime('%B', strtotime($req->fecha_inicio)). ' del '.strftime('%Y', strtotime($req->fecha_inicio));
@@ -268,13 +267,15 @@ class EmpleadosController extends Controller
 
         foreach ( $items as $item ) {
 
-            $fechaEntrega = $fechaFormateada = '';
+            $movimientos = $fechaEntrega = $fechaFormateada = '';
 
-            $entregados = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [1,2])->count();
-            $recibidos  = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [3])->count();
+            // $entregados = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [1,2])->count();
+            // $recibidos  = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [3])->count();
+            $entregados = $item->tipos()->whereIn('tipo_historial_id', [1,2])->exists();          
+            $recibidos = $item->tipos()->where('tipo_historial_id', 3)->exists();          
 
-            if ( $entregados > 0 ) { $totalEntregados += $item->cantidad; }
-            if ( $recibidos > 0 ) { $totalRecibidos += $item->cantidad; }
+            if ( $recibidos > 0 ) { $totalDevueltos += $item->cantidad; }
+            elseif ( $entregados > 0 ) { $totalEntregados += $item->cantidad; }
 
             foreach( $item->tipos as $move ) {
                 $fechaEntrega = $move->pivot->fecha;
@@ -298,8 +299,8 @@ class EmpleadosController extends Controller
             ];
         }
 
-        Excel::create('Histórico', function($excel) use ($rows, $totalEntregados, $totalRecibidos, $empleado, $periodo) {
-            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalEntregados, $totalRecibidos, $empleado, $periodo) {
+        Excel::create('Histórico', function($excel) use ($rows, $totalEntregados, $totalDevueltos, $empleado, $periodo) {
+            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalEntregados, $totalDevueltos, $empleado, $periodo) {
 
                 $sheet->cell('A1', function($cell) use ($empleado) {
                     if ( $empleado ) {
@@ -321,10 +322,10 @@ class EmpleadosController extends Controller
                     $cell->setValue('Artículos entregados: #'.number_format( $totalEntregados, 0));
                 });
 
-                $sheet->cell('A4', function($cell) use ($totalRecibidos) {
+                $sheet->cell('A4', function($cell) use ($totalDevueltos) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
-                    $cell->setValue('Artículos recibidos: #'.number_format( $totalRecibidos, 0));
+                    $cell->setValue('Artículos devueltos: #'.number_format( $totalDevueltos, 0));
                 });
 
                 $sheet->cells('A:K', function($cells) {

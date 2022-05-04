@@ -8,6 +8,7 @@ use \App\Recibo;
 use \App\Empleado;
 use \App\Historial;
 use \App\RazonSocial;
+use \App\HistorialTipo;
 use \App\StatusEmpleado;
 
 use Illuminate\Http\Request;
@@ -117,10 +118,10 @@ class RazonesSocialesController extends Controller
         $rows = $empleados = array();
         $req->request->add([ 'user' => auth()->user() ]);
         $razones = RazonSocial::filter( $req->all() )->orderBy('id', 'desc')->get();
-        $totalEntregadosGlobal = $totalRecibidosGlobal = 0;
+        $totalEntregadosGlobal = $totalDevueltosGlobal = 0;
 
         foreach ( $razones as $razon ) {
-            $totalEntregados = $totalRecibidos = 0;
+            $totalEntregados = $totalDevueltos = 0;
             
             if( $req->status_empleado_id ) {
                 $empleados = $razon->empleados->where('status_empleado_id', $req->status_empleado_id);
@@ -130,23 +131,35 @@ class RazonesSocialesController extends Controller
 
             // Suma la cantidad de uniformes entregados y recibidos por razón social
             foreach( $empleados as $empleado ) {
-                $totalEntregados += $empleado->uniformes_entregados->sum('cantidad');
-                $totalRecibidos  += $empleado->uniformes_recibidos->sum('cantidad');
+
+                foreach ( $empleado->uniformes as $uniformeHist ) {
+
+                    $movimientos = $fechaEntrega = $fechaFormateada = '';
+
+                    $entregados = $uniformeHist->tipos()->whereIn('tipo_historial_id', [1,2])->exists();          
+                    $recibidos = $uniformeHist->tipos()->where('tipo_historial_id', 3)->exists();          
+
+                    if ( $recibidos > 0 ) { $totalDevueltos += $uniformeHist->cantidad; }
+                    elseif ( $entregados > 0 ) { $totalEntregados += $uniformeHist->cantidad; }
+            }
+
+                // $totalEntregados += $empleado->uniformes_entregados->sum('cantidad');
+                // $totalDevueltos  += $empleado->uniformes_recibidos->sum('cantidad');
             }
 
             $rows [] = [
                 'Razón social'           => $razon->nombre,
                 'Artículos entregados'   => $totalEntregados,
-                'Artículos devueltos'    => $totalRecibidos,
-                'Artículos por devolver' => $totalEntregados - $totalRecibidos,
+                'Artículos devueltos'    => $totalDevueltos,
+                'Artículos por devolver' => $totalEntregados - $totalDevueltos,
             ];
 
             $totalEntregadosGlobal += $totalEntregados;
-            $totalRecibidosGlobal  += $totalRecibidos;
+            $totalDevueltosGlobal  += $totalDevueltos;
         }
 
-        Excel::create('Histórico por razón social', function($excel) use ($rows, $totalEntregadosGlobal, $totalRecibidosGlobal) {
-            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalEntregadosGlobal, $totalRecibidosGlobal) {
+        Excel::create('Histórico por razón social', function($excel) use ($rows, $totalEntregadosGlobal, $totalDevueltosGlobal) {
+            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalEntregadosGlobal, $totalDevueltosGlobal) {
 
                 $sheet->cell('A1', function($cell) use ($totalEntregadosGlobal) {
                     $cell->setFontWeight('bold');
@@ -154,16 +167,16 @@ class RazonesSocialesController extends Controller
                     $cell->setValue('Total de uniformes entregados al empleado: '.number_format( $totalEntregadosGlobal, 0));
                 });
 
-                $sheet->cell('A2', function($cell) use ($totalRecibidosGlobal) {
+                $sheet->cell('A2', function($cell) use ($totalDevueltosGlobal) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
-                    $cell->setValue('Total de uniformes devueltos por empleado: '.number_format( $totalRecibidosGlobal, 0));
+                    $cell->setValue('Total de uniformes devueltos por empleado: '.number_format( $totalDevueltosGlobal, 0));
                 });
 
-                $sheet->cell('A3', function($cell) use ($totalEntregadosGlobal, $totalRecibidosGlobal) {
+                $sheet->cell('A3', function($cell) use ($totalEntregadosGlobal, $totalDevueltosGlobal) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
-                    $cell->setValue('Artículos por devolver: '.number_format( $totalEntregadosGlobal - $totalRecibidosGlobal, 0));
+                    $cell->setValue('Artículos por devolver: '.number_format( $totalEntregadosGlobal - $totalDevueltosGlobal, 0));
                 });
 
                 $sheet->cells('A:D', function($cells) {
@@ -192,9 +205,10 @@ class RazonesSocialesController extends Controller
     {
         $rows = array();
         $req->request->add([ 'user' => auth()->user() ]);
-        $items = Historial::filter( $req->all() )->orderBy('fecha_entrega', 'desc')->get();
+        $razonSocial = RazonSocial::find($req->razon_social_id);
+        $items = Historial::filter( $req->all() )->get();
 
-        $totalEntregados = $totalRecibidos = 0;
+        $totalEntregados = $totalDevueltos = 0;
         $fechaInicioFormateada = 'N/A';
         $fechaFinFormateada = 'N/A'; 
 
@@ -209,79 +223,79 @@ class RazonesSocialesController extends Controller
         $periodo = $fechaInicioFormateada.' - '.$fechaFinFormateada;
 
         foreach ( $items as $item ) {
-            $fechaFormateada = 'N/A';
-            $pagos = 0;
+            $movimientos = $fechaEntrega = $fechaFormateada = '';
+            
+            // $entregados = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [1,2])->count();
+            // $recibidos  = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [3])->count();
+            $entregados = $item->tipos()->whereIn('tipo_historial_id', [1,2])->exists();          
+            $recibidos = $item->tipos()->where('tipo_historial_id', 3)->exists();          
 
-            if ( $item->tipo->id == 1 ) { // Entregados
-                $totalEntregados += $item->cantidad;
-            } else if ( $item->tipo->id == 2 ) { // Recibidos
-                $totalRecibidos += $item->cantidad;
+            if ( $recibidos > 0 ) { $totalDevueltos += $item->cantidad; }
+            elseif ( $entregados > 0 ) { $totalEntregados += $item->cantidad; }
+            
+            foreach( $item->tipos as $move ) {
+                $fechaEntrega = $move->pivot->fecha;
+                $fechaFormateada = strftime('%d', strtotime($fechaEntrega)).' de '.strftime('%B', strtotime($fechaEntrega)). ' del '.strftime('%Y', strtotime($fechaEntrega));
+                $movimientos .= ( $move->nombre.' - '.$fechaFormateada.' / ' );
             }
-
-            $fechaFormateada = $item->fecha_entrega ? strftime('%d', strtotime($item->fecha_entrega)).' de '.strftime('%B', strtotime($item->fecha_entrega)). ' del '.strftime('%Y', strtotime($item->fecha_entrega)) : '';
-
+            
             $rows [] = [
-                'Empleado'        => $item->empleado->nombre.' ('.$item->empleado->razon_social->nombre.')',
-                'Tipo'            => $item->tipo->descripcion,
-                'Artículo'        => $item->articulo->nombre,
-                'Status artículo' => $item->status->nombre,
-                'Talla'           => $item->talla->nombre,
-                'Color'           => $item->color,
-                'Cantidad'        => $item->cantidad,
-                'Fecha'           => $fechaFormateada,
-                'Notas'           => $item->notas,
+                'Empleado'          => $item->empleado->nombre,
+                'No. empleado'      => $item->empleado->numero_empleado,
+                'Artículo'          => $item->articulo->nombre,
+                'Status artículo'   => $item->status ? $item->status : 'N/A',
+                'Talla'             => $item->talla ? $item->talla : 'N/A',
+                'Color'             => $item->color ?? 'N/A',
+                'Cantidad'          => $item->cantidad ?? 'N/A',
+                'Movimientos'       => $movimientos ?? 'N/A',
+                'Servicio guardia'  => $item->servicio_guardia ?? 'N/A',
+                'Supervisor'        => $item->supervisor ?? 'N/A',
+                'Notas adicionales' => $item->notas,
             ];
         }
 
-        Excel::create('Listado de historial de uniformes', function($excel) use ($rows, $totalEntregados, $totalRecibidos, $periodo) {
-            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalEntregados, $totalRecibidos, $periodo) {
+        Excel::create('Histórico por razón social', function($excel) use ($rows, $totalEntregados, $totalDevueltos, $razonSocial, $periodo) {
+            $excel->sheet('Hoja 1', function($sheet) use($rows, $totalEntregados, $totalDevueltos, $razonSocial, $periodo) {
 
-                // $sheet->cell('A1', function($cell) use ($cliente) {
-                //     if ( $cliente ) {
-                //         $cell->setFontWeight('bold');
-                //         $cell->setFontSize(12);
-                //         $cell->setValue('Razón social: '.$cliente->razon_social->nombre);
-                //     }
-                // });
+                $sheet->cell('A1', function($cell) use ($razonSocial) {
+                    if ( $razonSocial ) {
+                        $cell->setFontWeight('bold');
+                        $cell->setFontSize(12);
+                        $cell->setValue('Razón social: '.$razonSocial->nombre);
+                    }
+                });
 
-                $sheet->cell('A1', function($cell) use($periodo) {
+                $sheet->cell('A2', function($cell) use($periodo) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
                     $cell->setValue('Periodo: '.$periodo);
                 });
 
-                $sheet->cell('A1', function($cell) use ($totalEntregados) {
+                $sheet->cell('A3', function($cell) use ($totalEntregados) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
-                    $cell->setValue('Total de uniformes entregados al empleado: '.number_format( $totalEntregados, 0));
+                    $cell->setValue('Artículos entregados: #'.number_format( $totalEntregados, 0));
                 });
 
-                $sheet->cell('A2', function($cell) use ($totalRecibidos) {
+                $sheet->cell('A4', function($cell) use ($totalDevueltos) {
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(12);
-                    $cell->setValue('Total de uniformes devueltos por empleado: '.number_format( $totalRecibidos, 0));
+                    $cell->setValue('Artículos devueltos: #'.number_format( $totalDevueltos, 0));
                 });
 
-                $sheet->cell('A3', function($cell) use ($totalEntregados, $totalRecibidos) {
-                    $cell->setFontWeight('bold');
-                    $cell->setFontSize(12);
-                    $cell->setValue('Artículos por devolver: '.number_format( $totalEntregados - $totalRecibidos, 0));
-                });
-
-                $sheet->cells('A:I', function($cells) {
+                $sheet->cells('A:K', function($cells) {
                     $cells->setAlignment('left');
                     $cells->setValignment('center');
                 });
 
-                $sheet->cells('A7:I7', function($cells) {
+                $sheet->cells('A6:K6', function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('center');
                     $cells->setFontWeight('bold');
                     $cells->setFontSize(12);
                 });
 
-                $sheet->fromArray($rows, null, 'A7', true);
-                // $sheet->setAutoFilter('A5:E5');
+                $sheet->fromArray($rows, null, 'A6', true);
             });
         })->export('xlsx');
     }

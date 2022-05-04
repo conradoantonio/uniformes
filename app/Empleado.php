@@ -48,6 +48,15 @@ class Empleado extends Model
      * Get the articles given related to the record
      *
      */
+    public function uniformes()
+    {
+        return $this->hasMany('App\Historial');
+    }
+
+    /**
+     * Get the articles given related to the record
+     *
+     */
     public function uniformes_entregados()
     {
         return $this->hasMany('App\Historial')->where('tipo_historial_id', 1);
