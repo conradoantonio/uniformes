@@ -223,7 +223,7 @@ class RazonesSocialesController extends Controller
         $periodo = $fechaInicioFormateada.' - '.$fechaFinFormateada;
 
         foreach ( $items as $item ) {
-            $movimientos = $fechaEntrega = $fechaFormateada = '';
+            $movimiento = $fechaEntrega = $fechaFormateada = '';
             
             // $entregados = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [1,2])->count();
             // $recibidos  = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [3])->count();
@@ -233,11 +233,16 @@ class RazonesSocialesController extends Controller
             if ( $recibidos > 0 ) { $totalDevueltos += $item->cantidad; }
             elseif ( $entregados > 0 ) { $totalEntregados += $item->cantidad; }
             
-            foreach( $item->tipos as $move ) {
-                $fechaEntrega = $move->pivot->fecha;
+            if ( $item->tipo ) {
+                $fechaEntrega = $item->fecha_entrega;
                 $fechaFormateada = strftime('%d', strtotime($fechaEntrega)).' de '.strftime('%B', strtotime($fechaEntrega)). ' del '.strftime('%Y', strtotime($fechaEntrega));
-                $movimientos .= ( $move->nombre.' - '.$fechaFormateada.' / ' );
+                $movimiento .= ( $item->tipo->nombre.' - '.$fechaFormateada );
             }
+            // foreach( $item->tipos as $move ) {
+            //     $fechaEntrega = $move->pivot->fecha;
+            //     $fechaFormateada = strftime('%d', strtotime($fechaEntrega)).' de '.strftime('%B', strtotime($fechaEntrega)). ' del '.strftime('%Y', strtotime($fechaEntrega));
+            //     $movimiento .= ( $move->nombre.' - '.$fechaFormateada.' / ' );
+            // }
             
             $rows [] = [
                 'Empleado'          => $item->empleado->nombre,
@@ -247,7 +252,7 @@ class RazonesSocialesController extends Controller
                 'Talla'             => $item->talla ? $item->talla : 'N/A',
                 'Color'             => $item->color ?? 'N/A',
                 'Cantidad'          => $item->cantidad ?? 'N/A',
-                'Movimientos'       => $movimientos ?? 'N/A',
+                'Movimientos'       => $movimiento ?? 'N/A',
                 'Servicio guardia'  => $item->servicio_guardia ?? 'N/A',
                 'Supervisor'        => $item->supervisor ?? 'N/A',
                 'Notas adicionales' => $item->notas,

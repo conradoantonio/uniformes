@@ -40,7 +40,7 @@ class HistoricosController extends Controller
 
                 $item = New Historial;
 
-                // $item->tipo_historial_id  = $tipo->id;
+                $item->tipo_historial_id  = $tipo->id;
                 $item->empleado_id        = $empleado->id;
                 $item->articulo_id        = $articulo->id;
                 $item->color              = $registro->color;
@@ -48,7 +48,7 @@ class HistoricosController extends Controller
                 $item->cantidad           = $registro->cantidad;
                 $item->status             = $articulo->status ? $articulo->status->nombre : 'N/A';
                 // $item->status_articulo_id = $status->id;
-                // $item->fecha_entrega      = $registro->fecha_entrega;
+                $item->fecha_entrega      = $registro->fecha_entrega;
                 $item->servicio_guardia   = $registro->servicio_guardia;
                 $item->supervisor         = $registro->supervisor;
                 $item->notas              = $registro->notas;
@@ -79,7 +79,7 @@ class HistoricosController extends Controller
     public function saveMove(Request $req)
     {
         $historial = Historial::find($req->id);
-        if (! $historial ) { return response(['msg' => 'Seleccione un artículo válido', 'status' => 'error'], 404); }
+        if (! $historial ) { return response(['msg' => 'Seleccione un registro válido', 'status' => 'error'], 404); }
 
         $tipo = TipoHistorial::find($req->tipo_historial_id);
         if (! $tipo ) { return response(['msg' => 'Seleccione un tipo de registro válido', 'status' => 'error'], 404); }
@@ -89,7 +89,14 @@ class HistoricosController extends Controller
             [ 'fecha' => $req->fecha  ]
         );
 
-        $data = $historial->load(['tipos']);
+        $historial->tipo_historial_id = $req->tipo_historial_id;
+        $historial->fecha_entrega     = $req->fecha;
+
+        $historial->save();
+
+        $data = $historial->load(['tipos', 'tipo']);
+
+        $data->fechaFormateada = strftime('%d', strtotime($data->fecha_entrega)).' de '.strftime('%B', strtotime($data->fecha_entrega)). ' del '.strftime('%Y', strtotime($data->fecha_entrega));
 
         foreach( $data->tipos as $tipo ) {
             $tipo->fechaFormateada = strftime('%d', strtotime($tipo->pivot->fecha)).' de '.strftime('%B', strtotime($tipo->pivot->fecha)). ' del '.strftime('%Y', strtotime($tipo->pivot->fecha));

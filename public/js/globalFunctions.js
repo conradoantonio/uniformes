@@ -201,7 +201,10 @@ $(function() {
         $(this).find('div.form-group').removeClass('has-error');
         $(this).find("input.form-control").val('');
         $(this).find("textarea.form-control").val('');
-        $(this).find("select.form-control").val(0);
+        $(this).find('select.form-control').each(function( index ) {
+            $( this ).val($(this).children("option:first").val());
+        });
+        // $(this).find("select.form-control").val(0);
         /*$('#foto_perfil').croppie('destroy');
         $('.upload-cr-pic').croppie('destroy');*/
     });

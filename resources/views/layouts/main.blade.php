@@ -220,7 +220,7 @@
 <script src="{{ asset('js/systemFunctions.js')}}"></script>
 <script src="{{ asset('js/general-ajax.js')}}"></script>
 <script src="{{ asset('js/validfunctions.js')}}"></script>
-<script src="{{ asset('js/globalFunctions.js?v=1.5')}}"></script>
+<script src="{{ asset('js/globalFunctions.js?v=1.6')}}"></script>
 <script src="{{ asset('vendor/blockui/jquery.blockUI.js')}}"></script>
 <script src="{{ asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js')}}"></script>
 <script src="{{ asset('vendor/timepicker/bootstrap-timepicker.min.js')}}"></script>

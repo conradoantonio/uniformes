@@ -115,12 +115,13 @@ class EmpleadosController extends Controller
      */
     public function verHistorico(Request $req)
     {
-        $items = Historial::with(['tipos', 'articulo'])
+        $items = Historial::with(['tipos', 'tipo', 'articulo'])
         ->filter( $req->all() )
         ->get();
         // ->where('id', $req->empleado_id)
 
         foreach ($items as $item) {
+            $item->fechaFormateada = strftime('%d', strtotime($item->fecha_entrega)).' de '.strftime('%B', strtotime($item->fecha_entrega)). ' del '.strftime('%Y', strtotime($item->fecha_entrega));
             foreach($item->tipos as $tipo) {
                 $tipo->fechaFormateada = strftime('%d', strtotime($tipo->pivot->fecha)).' de '.strftime('%B', strtotime($tipo->pivot->fecha)). ' del '.strftime('%Y', strtotime($tipo->pivot->fecha));
             }
@@ -267,7 +268,7 @@ class EmpleadosController extends Controller
 
         foreach ( $items as $item ) {
 
-            $movimientos = $fechaEntrega = $fechaFormateada = '';
+            $movimiento = $fechaEntrega = $fechaFormateada = '';
 
             // $entregados = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [1,2])->count();
             // $recibidos  = HistorialTipo::where('historial_id', $item->id)->whereIn('tipo_historial_id', [3])->count();
@@ -277,11 +278,16 @@ class EmpleadosController extends Controller
             if ( $recibidos > 0 ) { $totalDevueltos += $item->cantidad; }
             elseif ( $entregados > 0 ) { $totalEntregados += $item->cantidad; }
 
-            foreach( $item->tipos as $move ) {
-                $fechaEntrega = $move->pivot->fecha;
+            if ( $item->tipo ) {
+                $fechaEntrega = $item->fecha_entrega;
                 $fechaFormateada = strftime('%d', strtotime($fechaEntrega)).' de '.strftime('%B', strtotime($fechaEntrega)). ' del '.strftime('%Y', strtotime($fechaEntrega));
-                $movimientos .= ( $move->nombre.' - '.$fechaFormateada.' / ' );
+                $movimiento .= ( $item->tipo->nombre.' - '.$fechaFormateada );
             }
+            // foreach( $item->tipos as $move ) {
+            //     $fechaEntrega = $move->pivot->fecha;
+            //     $fechaFormateada = strftime('%d', strtotime($fechaEntrega)).' de '.strftime('%B', strtotime($fechaEntrega)). ' del '.strftime('%Y', strtotime($fechaEntrega));
+            //     $movimiento .= ( $move->nombre.' - '.$fechaFormateada.' / ' );
+            // }
             
 
             $rows [] = [
@@ -292,7 +298,8 @@ class EmpleadosController extends Controller
                 'Talla'             => $item->talla ? $item->talla : 'N/A',
                 'Color'             => $item->color ?? 'N/A',
                 'Cantidad'          => $item->cantidad ?? 'N/A',
-                'Movimientos'       => $movimientos ?? 'N/A',
+                'Movimiento'        => $movimiento ?? 'N/A',
+                // 'Movimientos'       => $movimiento ?? 'N/A',
                 'Servicio guardia'  => $item->servicio_guardia ?? 'N/A',
                 'Supervisor'        => $item->supervisor ?? 'N/A',
                 'Notas adicionales' => $item->notas,

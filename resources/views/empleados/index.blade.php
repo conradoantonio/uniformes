@@ -128,15 +128,21 @@
                 console.log(rows[key]);
 
                 let tipos = rows[key].tipos;
-                let movimientosHtml = '';
+                let tipo  = rows[key].tipo;
+                // let movimientosHtml = '';
+                let movimientoHtml  = '';
+
+                if ( tipo ) {
+                    movimientoHtml += '<span class="badge badge-'+( tipo.clase ?? 'warning' )+'">'+( tipo.nombre ? tipo.nombre+' - '+rows[key].fechaFormateada : 'N/A' )+'</span><br>';
+                }
                 // let tipoHtml   = '<span class="badge badge-'+( rows[key].tipo.clase )+'">'+( rows[key].tipo.nombre )+'</span>';
                 // let statusHtml = '<span class="badge badge-'+( rows[key].status ? rows[key].status.clase : 'warning' )+'">'+( rows[key].status ? rows[key].status.nombre : 'N/A' )+'</span>';
                 
-                if ( tipos.length ) {
-                    for ( var index in tipos ) {
-                        movimientosHtml += '<span class="badge badge-'+( tipos[index].clase ?? 'warning' )+'">'+( tipos[index].nombre ? tipos[index].nombre+' - '+tipos[index].fechaFormateada : 'N/A' )+'</span><br>';
-                    }
-                }
+                // if ( tipos.length ) {
+                //     for ( var index in tipos ) {
+                //         movimientosHtml += '<span class="badge badge-'+( tipos[index].clase ?? 'warning' )+'">'+( tipos[index].nombre ? tipos[index].nombre+' - '+tipos[index].fechaFormateada : 'N/A' )+'</span><br>';
+                //     }
+                // }
 
                 $('table.historico tbody').append(
                     '<tr class="item registro-'+rows[key].id+'" data-row-id="'+rows[key].id+'">'+
@@ -150,7 +156,7 @@
                         '<td class="align-middle">'+( rows[key].supervisor ?? 'N/A' )+'</td>'+
                         // '<td class="align-middle">'+( rows[key].fechaFormateada ?? 'N/A' )+'</td>'+
                         '<td class="align-middle">'+( rows[key].notas ?? 'N/A' )+'</td>'+
-                        '<td class="align-middle" style="white-space: nowrap;">'+( movimientosHtml )+'</td>'+
+                        '<td class="align-middle" style="white-space: nowrap;">'+( movimientoHtml )+'</td>'+
                         '<td class="align-middle">'+
                             '<button class="btn btn-danger btn-sm delete-historic" data-row-id='+rows[key].id+' data-toggle="tooltip" data-placement="top" title="Eliminar registro">'+
                                 '<i class="mdi mdi-close-circle"></i>'+
@@ -179,20 +185,25 @@
         console.log(data, config);
         
         let item  = data.data;
-        let tipos = item.tipos;
-        let movimientosHtml = '';
+        // let tipos = item.tipos;
+        let tipo  = item.tipo;
+        // let movimientosHtml = '';
+        let movimientoHtml  = '';
         let searchTr = $('table.historico > tbody > tr[data-row-id="'+item.id+'"]');
 
         console.log(searchTr);
         
         if ( searchTr.length ) {// Se tiene acceso al tr que contiene la información del artículo previamente modificado
-            if ( item.tipos.length ) {
-                    for ( var index in tipos ) {
-                        movimientosHtml += '<span class="badge badge-'+( tipos[index].clase ?? 'warning' )+'">'+( tipos[index].nombre ? tipos[index].nombre+' - '+tipos[index].fechaFormateada : 'N/A' )+'</span><br>';
-                    }
-                }
+            if ( tipo ) {
+                movimientoHtml += '<span class="badge badge-'+( tipo.clase ?? 'warning' )+'">'+( tipo.nombre ? tipo.nombre+' - '+item.fechaFormateada : 'N/A' )+'</span><br>';
+            }
+            // if ( item.tipos.length ) {
+            //     for ( var index in tipos ) {
+            //         movimientosHtml += '<span class="badge badge-'+( tipos[index].clase ?? 'warning' )+'">'+( tipos[index].nombre ? tipos[index].nombre+' - '+tipos[index].fechaFormateada : 'N/A' )+'</span><br>';
+            //     }
+            // }
             //     searchTr.data('row', metodoObj);
-            searchTr.children('td').siblings("td:nth-child(9)").html(movimientosHtml);
+            searchTr.children('td').siblings("td:nth-child(9)").html(movimientoHtml);
         }       
         $('div#modal-add-historic-move').modal('hide')
     }
