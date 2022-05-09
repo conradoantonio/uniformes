@@ -23,18 +23,23 @@ DROP TABLE IF EXISTS `articulos`;
 CREATE TABLE `articulos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
+  `talla` varchar(100) DEFAULT NULL,
+  `color` varchar(100) DEFAULT NULL,
+  `status_articulo_id` int(11) NOT NULL,
   `descripcion` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `cliente_id` (`nombre`),
-  KEY `status_id` (`descripcion`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+  KEY `status_id` (`descripcion`),
+  KEY `status_articulo_id` (`status_articulo_id`),
+  CONSTRAINT `articulos_ibfk_1` FOREIGN KEY (`status_articulo_id`) REFERENCES `status_articulo` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `articulos` */
 
-insert  into `articulos`(`id`,`nombre`,`descripcion`,`created_at`,`updated_at`,`deleted_at`) values (1,'Camisas','Camisa de guardia','2022-04-01 13:16:02','2022-04-03 22:50:13',NULL),(2,'Pantalón','Pantalón de guardia','2022-04-01 13:16:02','2022-04-01 13:16:02',NULL),(3,'Cachucha','Cachucha de guardia','2022-04-01 13:16:02','2022-04-01 13:16:02',NULL),(4,'Botas','Botas con refuerzo metálico','2022-04-03 22:50:40','2022-04-03 22:50:40',NULL);
+insert  into `articulos`(`id`,`nombre`,`talla`,`color`,`status_articulo_id`,`descripcion`,`created_at`,`updated_at`,`deleted_at`) values (1,'Camisas','Grande','Blanco',1,'Camisa de guardia','2022-04-01 13:16:02','2022-04-03 22:50:13',NULL),(2,'Pantalón','Grande','Azul',1,'Pantalón de guardia','2022-04-01 13:16:02','2022-04-01 13:16:02',NULL),(3,'Cachucha','N/A','Negra',1,'Cachucha de guardia','2022-04-01 13:16:02','2022-04-01 13:16:02',NULL),(4,'Botas','4 y medio','Negra',1,'Botas con refuerzo metálico','2022-04-03 22:50:40','2022-04-03 22:50:40',NULL),(5,'Cubrebocas','N/A','Blanco',1,'Cubrebocas KN95 con logotipo de la empresa.','2022-04-08 02:37:32','2022-04-08 02:37:42',NULL),(6,'Rodilleras','N/A','Negro',1,'Lorem','2022-04-25 22:59:59','2022-04-25 22:59:59',NULL);
 
 /*Table structure for table `empleados` */
 
@@ -44,9 +49,8 @@ CREATE TABLE `empleados` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `razon_social_id` int(11) NOT NULL,
   `status_empleado_id` int(11) NOT NULL,
-  `nombre` varchar(255) DEFAULT NULL COMMENT 'Nombre completo',
+  `nombre` varchar(255) NOT NULL COMMENT 'Nombre completo',
   `numero_empleado` varchar(100) DEFAULT NULL,
-  `ine` varchar(255) DEFAULT NULL,
   `domicilio` varchar(255) DEFAULT NULL COMMENT 'Domicilio completo',
   `fecha_ingreso` date DEFAULT NULL,
   `fecha_baja` date DEFAULT NULL,
@@ -59,11 +63,11 @@ CREATE TABLE `empleados` (
   KEY `status_cliente_id` (`status_empleado_id`),
   CONSTRAINT `empleados_ibfk_1` FOREIGN KEY (`razon_social_id`) REFERENCES `razones_sociales` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `empleados_ibfk_2` FOREIGN KEY (`status_empleado_id`) REFERENCES `status_empleado` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `empleados` */
 
-insert  into `empleados`(`id`,`razon_social_id`,`status_empleado_id`,`nombre`,`numero_empleado`,`ine`,`domicilio`,`fecha_ingreso`,`fecha_baja`,`observaciones`,`created_at`,`updated_at`,`deleted_at`) values (1,1,1,'ADOLFO LÓPEZ MATEOS','10004223','3317528811','AVENIDA SIEMPRE VIVA #4320','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2021-08-30 12:33:50',NULL),(2,1,1,'MANUEL ROSALES','10004329','3318890674/3337701057','FEDERALISMO GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2021-08-30 12:33:50',NULL),(3,1,1,'ALDEBARÁN VILLALOBOS','10001318','3334910477/3323841685','AV. LA CAÑA No. 3065, COL. LA NOGALERA, C.P. 44490, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-03 22:09:05',NULL),(4,1,2,'MARCO ANTONIO SOLIS','10004544','4421770192','AV. CECYT No. 100, COL. NUEVO FUERTE, C.P. 47899, OCOTLAN, JALISCO','2022-03-30','2022-04-03','Hola','2021-08-30 12:33:50','2022-04-03 22:49:08',NULL),(5,4,1,'ALONDRA BELTRÁN','10000421','3338111115','CALLE 8, COL. COLON INDUSTRIAL, C.P. 44940, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-08 01:06:15',NULL),(6,1,3,'RICARDO LÓPEZ','10003121','3338129508','AV. ENRIQUE DIAZ DE LEON No. 783. COL. MODERNA, C.P. 44190, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-03 22:49:48',NULL);
+insert  into `empleados`(`id`,`razon_social_id`,`status_empleado_id`,`nombre`,`numero_empleado`,`domicilio`,`fecha_ingreso`,`fecha_baja`,`observaciones`,`created_at`,`updated_at`,`deleted_at`) values (1,1,1,'ADOLFO LÓPEZ MATEOS','10004223','AVENIDA SIEMPRE VIVA #4320','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2021-08-30 12:33:50',NULL),(2,1,1,'MANUEL ROSALES','10004329','FEDERALISMO GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2021-08-30 12:33:50',NULL),(3,1,1,'ALDEBARÁN VILLALOBOS','10001318','AV. LA CAÑA No. 3065, COL. LA NOGALERA, C.P. 44490, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-03 22:09:05',NULL),(4,1,2,'MARCO ANTONIO SOLIS','10004544','AV. CECYT No. 100, COL. NUEVO FUERTE, C.P. 47899, OCOTLAN, JALISCO','2022-03-30','2022-04-03','Hola','2021-08-30 12:33:50','2022-04-03 22:49:08',NULL),(5,4,1,'ALONDRA BELTRÁN','10000421','CALLE 8, COL. COLON INDUSTRIAL, C.P. 44940, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-08 01:06:15',NULL),(6,1,3,'RICARDO LÓPEZ','10003121','AV. ENRIQUE DIAZ DE LEON No. 783. COL. MODERNA, C.P. 44190, GUADALAJARA, JALISCO','2022-03-30',NULL,NULL,'2021-08-30 12:33:50','2022-04-03 22:49:48',NULL),(8,4,1,'ANTONIO ROSALES','238172398',NULL,'2022-04-29',NULL,'Lorem ipsum','2022-04-29 04:06:46','2022-04-29 04:06:46',NULL);
 
 /*Table structure for table `historial` */
 
@@ -71,33 +75,53 @@ DROP TABLE IF EXISTS `historial`;
 
 CREATE TABLE `historial` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tipo_historial_id` int(11) NOT NULL,
+  `tipo_historial_id` int(11) DEFAULT NULL COMMENT 'Remover',
   `empleado_id` int(11) NOT NULL,
-  `articulo_id` int(11) NOT NULL COMMENT 'Nota de crédito o pago',
-  `status_articulo_id` int(11) NOT NULL,
-  `talla_id` int(11) NOT NULL COMMENT 'Número de factura',
-  `color` varchar(255) DEFAULT NULL,
+  `articulo_id` int(11) NOT NULL,
+  `color` varchar(100) DEFAULT NULL,
+  `talla` varchar(100) DEFAULT NULL,
+  `status` varchar(100) DEFAULT NULL,
   `cantidad` int(30) DEFAULT NULL,
-  `fecha_entrega` date DEFAULT NULL,
+  `fecha_entrega` date DEFAULT NULL COMMENT 'Remover',
   `notas` text DEFAULT NULL,
+  `servicio_guardia` varchar(100) DEFAULT NULL,
+  `supervisor` varchar(100) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `tipo_recibo_id` (`articulo_id`),
   KEY `cliente_id` (`empleado_id`),
-  KEY `factura_id` (`talla_id`),
-  KEY `status_articulo_id` (`status_articulo_id`),
   KEY `tipo_historial_id` (`tipo_historial_id`),
   CONSTRAINT `historial_ibfk_1` FOREIGN KEY (`empleado_id`) REFERENCES `empleados` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `historial_ibfk_2` FOREIGN KEY (`articulo_id`) REFERENCES `articulos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `historial_ibfk_3` FOREIGN KEY (`status_articulo_id`) REFERENCES `status_articulo` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `historial_ibfk_4` FOREIGN KEY (`talla_id`) REFERENCES `tallas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `historial_ibfk_5` FOREIGN KEY (`tipo_historial_id`) REFERENCES `tipo_historial` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=835 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `historial` */
 
-insert  into `historial`(`id`,`tipo_historial_id`,`empleado_id`,`articulo_id`,`status_articulo_id`,`talla_id`,`color`,`cantidad`,`fecha_entrega`,`notas`,`created_at`,`updated_at`) values (823,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(824,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(825,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(826,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(827,1,1,1,1,1,'Blanco',5,'2022-04-03','Lorem ipsum','2022-04-03 23:59:25','2022-04-03 23:59:25'),(828,1,5,2,3,1,'Gris',9,'2022-04-21','Lorem ipsum','2022-04-07 23:45:37','2022-04-07 23:45:37'),(829,2,5,1,1,1,'Blanco',10,'2022-04-07','Lorem ipsum','2022-04-07 23:48:31','2022-04-07 23:48:31'),(830,1,5,2,2,2,'Blanco',1,'2022-04-07','Lorem ipsum','2022-04-07 23:48:31','2022-04-07 23:48:31'),(831,1,5,1,1,2,'Blanca',2,'2022-04-07','Lorem','2022-04-07 23:49:49','2022-04-07 23:49:49'),(832,2,5,4,3,1,'Negras',2,'2022-04-07','Lorem i´sum','2022-04-07 23:49:49','2022-04-07 23:49:49'),(833,1,5,1,1,2,'Blanca',2,'2022-04-07','Lorem','2022-04-07 23:54:32','2022-04-07 23:54:32'),(834,2,5,4,3,1,'Negras',2,'2022-04-07','Lorem i´sum','2022-04-07 23:54:32','2022-04-07 23:54:32');
+insert  into `historial`(`id`,`tipo_historial_id`,`empleado_id`,`articulo_id`,`color`,`talla`,`status`,`cantidad`,`fecha_entrega`,`notas`,`servicio_guardia`,`supervisor`,`created_at`,`updated_at`) values (4,1,8,1,'Blanco','Grande','Nueva',1,'2022-05-06','Lorem ipsum','Andares','Vicente','2022-04-29 04:10:22','2022-05-06 02:13:14'),(5,2,8,2,'Azul','Grande','Nueva',4,'2022-05-09','Lorem ipsum','Andares','Vicente','2022-04-29 04:10:22','2022-05-09 00:03:09'),(6,NULL,5,4,'Negra','4 y medio','Nueva',2,NULL,'Nota 1','24 hrs','Marco Antonio','2022-05-04 02:33:24','2022-05-04 02:33:24'),(7,NULL,3,5,'Blanco','N/A','Nueva',2,NULL,'Nota 1','18 hrs','N/A','2022-05-04 03:06:23','2022-05-04 03:06:23'),(8,3,8,4,'Negra','4 y medio','Nueva',1,'2022-05-09','lorem','123','asd','2022-05-09 00:02:44','2022-05-09 00:03:03'),(9,2,8,6,'Negro','N/A','Nueva',1,'2022-05-10','asdf','23','sep 2','2022-05-09 00:02:44','2022-05-09 00:02:44');
+
+/*Table structure for table `historial_tipo` */
+
+DROP TABLE IF EXISTS `historial_tipo`;
+
+CREATE TABLE `historial_tipo` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `historial_id` int(11) NOT NULL,
+  `tipo_historial_id` int(11) NOT NULL,
+  `fecha` date NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `historial_id` (`historial_id`),
+  KEY `tipo_historial_id` (`tipo_historial_id`),
+  CONSTRAINT `historial_tipo_ibfk_1` FOREIGN KEY (`historial_id`) REFERENCES `historial` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `historial_tipo_ibfk_2` FOREIGN KEY (`tipo_historial_id`) REFERENCES `tipo_historial` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4;
+
+/*Data for the table `historial_tipo` */
+
+insert  into `historial_tipo`(`id`,`historial_id`,`tipo_historial_id`,`fecha`,`created_at`,`updated_at`) values (10,4,1,'2022-05-06','2022-04-29 04:10:22','2022-05-06 02:13:14'),(11,5,3,'2022-05-07','2022-04-29 04:10:22','2022-05-06 02:12:29'),(12,5,2,'2022-05-09','2022-04-29 04:10:59','2022-05-09 00:03:09'),(13,6,1,'2022-05-04','2022-05-04 02:33:24','2022-05-04 02:33:24'),(14,7,2,'2022-05-04','2022-05-04 03:06:23','2022-05-04 03:06:23'),(15,5,1,'2022-05-06','2022-05-06 01:54:26','2022-05-06 02:12:53'),(16,8,1,'2022-05-08','2022-05-09 00:02:44','2022-05-09 00:02:44'),(17,9,2,'2022-05-10','2022-05-09 00:02:44','2022-05-09 00:02:44'),(18,8,3,'2022-05-09','2022-05-09 00:03:03','2022-05-09 00:03:03');
 
 /*Table structure for table `modulos` */
 
@@ -225,7 +249,7 @@ CREATE TABLE `status_articulo` (
 
 /*Data for the table `status_articulo` */
 
-insert  into `status_articulo`(`id`,`nombre`,`descripcion`,`clase`,`created_at`,`updated_at`) values (1,'Nueva','Artículo nuevo','success','2021-06-09 00:26:10','2021-06-09 00:26:10'),(2,'Semiusado','Artículo semiusado','warning','2021-06-09 00:26:10','2021-06-09 00:26:10'),(3,'Desgastado','Artículo desgastado','danger','2021-06-09 00:26:10','2021-06-09 00:26:10');
+insert  into `status_articulo`(`id`,`nombre`,`descripcion`,`clase`,`created_at`,`updated_at`) values (1,'Nueva','Artículo nuevo','success','2021-06-09 00:26:10','2021-06-09 00:26:10'),(2,'Usado','Artículo semiusado','warning','2021-06-09 00:26:10','2021-06-09 00:26:10'),(3,'Desgastado','Artículo desgastado','danger','2021-06-09 00:26:10','2021-06-09 00:26:10');
 
 /*Table structure for table `status_empleado` */
 
@@ -274,11 +298,11 @@ CREATE TABLE `tipo_historial` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `tipo_historial` */
 
-insert  into `tipo_historial`(`id`,`nombre`,`descripcion`,`clase`,`created_at`,`updated_at`) values (1,'Entregado','Entregado al empleado','info','2021-06-03 18:03:59','2021-06-03 18:03:59'),(2,'Recibo','Devueltos por empleado','success','2021-06-03 18:03:59','2021-06-03 18:03:59');
+insert  into `tipo_historial`(`id`,`nombre`,`descripcion`,`clase`,`created_at`,`updated_at`) values (1,'En ruta','En ruta al empleado','warning','2021-06-03 18:03:59','2021-06-03 18:03:59'),(2,'Entregado','Devueltos por empleado','info','2021-06-03 18:03:59','2021-06-03 18:03:59'),(3,'Devuelto','Devuelto por empleado','success','2022-04-29 00:28:26','2022-04-29 00:28:26');
 
 /*Table structure for table `users` */
 

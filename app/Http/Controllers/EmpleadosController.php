@@ -99,7 +99,7 @@ class EmpleadosController extends Controller
         ];
         
         $tallas = Talla::all();
-        $articulos = Articulo::orderBy('nombre', 'asc')->get();
+        $articulos = Articulo::with(['status'])->orderBy('nombre', 'asc')->get();
         $status = StatusArticulo::all();
 
         if ( $id ) {

@@ -46,7 +46,7 @@
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label class="control-label" for="type">Tipo de registro*</label>
-                                    <select id="tipo_historial_id" name="tipo_historial_id" class="form-control not-empty" data-msg="Tipo de registro">
+                                    <select id="tipo_historial_id" name="tipo_historial_id" class="form-control reset not-empty" data-msg="Tipo de registro">
                                         <option value="1">En ruta</option>
                                         <option value="2">Entregado</option>
                                         <option value="3">Devuelto</option>
@@ -55,7 +55,7 @@
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="control-label" for="type">Artículo*</label>
-                                    <select id="articulo_id" name="articulo_id" class="form-control not-empty" data-msg="Artículo">
+                                    <select id="articulo_id" name="articulo_id" class="form-control reset not-empty" data-msg="Artículo">
                                         <option value="" selected>Seleccione una opción</option>
                                         @foreach($articulos as $articulo)
                                             <option value="{{$articulo->id}}" data-obj="{{$articulo}}" >{{$articulo->nombre}}</option>
@@ -64,31 +64,35 @@
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="control-label" for="type">Talla</label>
-                                    <input type="text" class="form-control" name="talla" value="" data-msg="Talla">
+                                    <input type="text" class="form-control reset" name="talla" value="" data-msg="Talla">
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label>Color</label>
-                                    <input type="text" class="form-control" name="color" value="" data-msg="Color">
+                                    <input type="text" class="form-control reset" name="color" value="" data-msg="Color">
                                 </div>
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-4">
+                                    <label>Status*</label>
+                                    <input type="text" class="form-control reset not-empty" name="status" value="" disabled data-msg="Status">
+                                </div>
+                                <div class="form-group col-md-4">
                                     <label>Cantidad*</label>
-                                    <input type="text" class="form-control not-empty" name="cantidad" value="" data-msg="Cantidad">
+                                    <input type="text" class="form-control reset not-empty" name="cantidad" value="" data-msg="Cantidad">
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label>Fecha entrega</label>
-                                    <input type="text" class="form-control not-empty date-picker" name="fecha_entrega" value="" data-msg="Fecha de entrega">
+                                <div class="form-group col-md-4">
+                                    <label>Fecha entrega*</label>
+                                    <input type="text" class="form-control reset not-empty date-picker" name="fecha_entrega" value="" data-msg="Fecha de entrega">
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Supervisor</label>
-                                    <input type="text" class="form-control" name="supervisor" value="" data-msg="Supervisor">
+                                    <input type="text" class="form-control reset" name="supervisor" value="" data-msg="Supervisor">
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Servicio del guardia</label>
-                                    <input type="text" class="form-control" name="servicio_guardia" value="" data-msg="Servicio del guardia">
+                                    <input type="text" class="form-control reset" name="servicio_guardia" value="" data-msg="Servicio del guardia">
                                 </div>
                                 <div class="form-group col-md-12">
                                     <label>Notas</label>
-                                    <textarea name="notas" class="form-control" rows="3" data-msg="Notas"></textarea>
+                                    <textarea name="notas" class="form-control reset" rows="3" data-msg="Notas"></textarea>
                                 </div>
                                 
                             </div>
@@ -110,12 +114,14 @@
                                             <th class="align-middle">Color</th>
                                             <th class="align-middle">Cantidad</th>
                                             <th class="align-middle">Fecha entrega</th>
+                                            <th class="align-middle">Supervisor</th>
+                                            <th class="align-middle">Servicio</th>
                                             <th class="align-middle">Notas</th>
                                             <th class="align-middle">Acciones</th>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td colspan="9">Sin registros</td>
+                                                <td colspan="11">Sin registros</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -142,17 +148,46 @@
     $('#articulo_id').on('change', function() {
         let obj = $(this).children(':selected').data('obj');
         
-        $('[name="talla"], [name="color"]').val('');
+        $('[name="talla"], [name="color"], [name="status"]').val('');
 
         if ( obj ) {
             $('[name="talla"]').val(obj.talla);
             $('[name="color"]').val(obj.color);
+            $('[name="status"]').val(obj.status.nombre);
         }
+    });
+
+    // Elimina un registro de la tabla
+    $('body').delegate('.delete-row-historial','click', function() {
+        let row   = $(this).parent().parent().data('row');
+        let table = $(this).data('table-ref');
+        let id    = ( row && row.timer_id ? row.timer_id : 0 );
+
+        swal({
+            title: '¿Desea eliminar el registro seleccionado?',
+            icon: 'warning',
+            buttons:["Cancelar", "Aceptar"],
+            dangerMode: true,
+        }).then((accept) => {
+            if ( accept ) {
+                $(table).children('tbody').children('tr[data-row-id="'+id+'"]').remove();
+
+                // Si no hay más uniformes, se coloca el mensaje por default
+                if (! $(table).children('tbody').children('tr.row-item').length ) {
+                    $( table ).append(
+                        '<tr>'+
+                            '<td colspan="11">Sin registros</td>'+
+                        '</tr>'
+                    );
+                }
+            }
+        }).catch(swal.noop);
     });
 
     // Valida el agregar un registro de uniformes a la tabla
     function agregarRegistro() { 
         let timerId = Date.now();
+        let articuloObj = $('select[name="articulo_id"]').children(':selected').data('obj');
         let registro = {
             timer_id           : timerId,
             empleado_id        : $('input[name="empleado_id"]').val(),
@@ -160,6 +195,8 @@
             tipo_historial_id  : $('select[name="tipo_historial_id"]').val(),
             articulo           : $('select[name="articulo_id"]').children(':selected').text(),
             articulo_id        : $('select[name="articulo_id"]').val(),
+            status             : articuloObj.status.nombre,
+            status_id          : articuloObj.status.id,
             talla              : $('input[name="talla"]').val(),
             color              : $('input[name="color"]').val(),
             cantidad           : $('input[name="cantidad"]').val(),
@@ -191,7 +228,7 @@
                 '<tr data-row-id='+timerId+' class="row-item" data-row=' + "'" + JSON.stringify(registro) + "'" + '>' +
                     '<td>'+ ( registro.tipo_historial ) +'</td>'+
                     '<td>'+ ( registro.articulo ) +'</td>'+
-                    // '<td>'+ ( registro.status_articulo ) +'</td>'+
+                    '<td>'+ ( registro.status ) +'</td>'+
                     '<td>'+ ( registro.talla ) +'</td>'+
                     '<td>'+ ( registro.color ) +'</td>'+
                     '<td>'+ ( registro.cantidad ) +'</td>'+
@@ -205,7 +242,19 @@
                 '</tr>'
             );
 
+            // <th class="align-middle">Tipo</th>
+            // <th class="align-middle">Artículo</th>
+            // <th class="align-middle">Status</th>
+            // <th class="align-middle">Talla</th>
+            // <th class="align-middle">Color</th>
+            // <th class="align-middle">Cantidad</th>
+            // <th class="align-middle">Fecha entrega</th>
+            // <th class="align-middle">Notas</th>
+            // <th class="align-middle">Acciones</th>
+
         // }
+
+        resetearFormulario();
     };
     
     // Método para guardar el registro de uniformes
@@ -237,31 +286,13 @@
         ajaxFormCustom(formData, config);
     }
 
-    // Elimina un registro de la tabla
-    $('body').delegate('.delete-row-historial','click', function() {
-        let row   = $(this).parent().parent().data('row');
-        let table = $(this).data('table-ref');
-        let id    = ( row && row.timer_id ? row.timer_id : 0 );
+    // Limpia el formulario después de agregar un artículo al empleado
+    function resetearFormulario() {
+        $('input.reset, textarea.reset').val('');
+        $('select.reset').each(function( index ) {
+            $( this ).val($(this).children("option:first").val());
+        });
+    }
 
-        swal({
-            title: '¿Desea eliminar el registro seleccionado?',
-            icon: 'warning',
-            buttons:["Cancelar", "Aceptar"],
-            dangerMode: true,
-        }).then((accept) => {
-            if ( accept ) {
-                $(table).children('tbody').children('tr[data-row-id="'+id+'"]').remove();
-
-                // Si no hay más uniformes, se coloca el mensaje por default
-                if (! $(table).children('tbody').children('tr.row-item').length ) {
-                    $(table).append(
-                        '<tr>'+
-                            '<td colspan="9">Sin registros</td>'+
-                        '</tr>'
-                    )
-                }
-            }
-        }).catch(swal.noop);
-    });
 </script>
 @endsection
